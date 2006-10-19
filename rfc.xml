@@ -1,0 +1,1781 @@
+<?xml version='1.0'?>
+
+<!DOCTYPE rfc SYSTEM 'rfc2629.dtd' [
+
+<!ENTITY rfc0959 SYSTEM 'refs/reference.RFC.0959.xml'>
+<!ENTITY rfc1900 SYSTEM 'refs/reference.RFC.1900.xml'>
+<!ENTITY rfc2119 SYSTEM 'refs/reference.RFC.2119.xml'>
+<!ENTITY rfc2183 SYSTEM 'refs/reference.RFC.2183.xml'>
+<!ENTITY rfc2234 SYSTEM 'refs/reference.RFC.2234.xml'>
+<!ENTITY rfc2616 SYSTEM 'refs/reference.RFC.2616.xml'>
+
+]>
+
+<?rfc inline='yes'?>
+<?rfc compact='no'?>
+<?rfc editing='no'?>
+<?rfc header='GTP/1.0'?>
+<?rfc private='GitTorrent Protocol version 1.0'?>
+<?rfc subcompact='no'?>
+<?rfc toc='yes'?>
+<?rfc tocindent='no'?>
+
+<rfc>
+
+<front> <!-- ======================================================= -->
+
+<title>GitTorrent Protocol -- GTP/1.0</title>
+
+<author initials='J.F.' surname='Fonseca' fullname='Jonas Fonseca'>
+	<organization>DIKU</organization>
+	<address><email>fonseca@diku.dk</email></address>
+</author>
+
+<date month='October' year='2006' />
+
+<abstract>
+<t>
+
+   This document describes the GitTorrent Protocol version 1.0 referred
+   to as "GTP/1.0". The GitTorrent Protocol (GTP) is a protocol for
+   collaborative git repository distribution across the Internet. It is
+   best classified as a peer-to-peer (P2P) protocol, although it also
+   contains highly centralized elements.
+
+</t>
+<t>
+
+   Git is a decentralized version control system (VCS) created in the
+   begining of 2005 by Linus Torvalds. To date only client-server based
+   distribution has been supported. Although git is able to densly
+   exchange updates between repositories and thereby minimize the
+   overall resource requirements for distributing git repositories
+   distribution will occationally involve clients cloning a complete
+   repository. This poses much strain on sites hosting many git
+   repositories in terms of request-processing and sheer bandwidth.  It
+   is the goal of GTP to facilitate such hosting services in reducing
+   resource demands.
+
+</t>
+<t>
+
+   Normally a client does not use their upload capacity while downloading
+   a repository. The GTP approach The GTP approach capitalizes on this
+   fact by having clients upload bits of the repository data to each
+   other. In comparison to the original client-server distribution this
+   adds huge scalability and cost-management advantages.
+  
+</t>
+</abstract>
+
+</front>
+
+<middle> <!-- ================================================ -->
+
+<section title="Introduction">
+<t>
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in
+   <xref target="RFC2119">RFC 2119</xref>.
+
+</t>
+<t>
+
+   The existing distribution protocols provides secure and reliable
+   transmission of large git repositories over the Internet. However,
+   its highly centralized client-server approach also means, it is
+   inadequate for mass publication of files, where a single point may
+   expect to be requested by a critically large number of clients
+   simultaneously. To remedy this situation many organizations either
+   implement a cap on the number of simultaneous requests, or spread the
+   load on multiple mirror servers. Needless to say both approaches have
+   their drawbacks, and a solution that addresses these problems is
+   highly needed.
+
+</t>
+<t>
+
+   The approach in GitTorrent Protocol (GTP) is to spread the load not on
+   mirror servers, but to the clients themselves by having them upload bits of
+   the file to each other while downloading it.  Since the clients usually do
+   not utilize their upload capacity while fetching a file, this approach does
+   not put the clients in any disadvantage. This has the added advantage that
+   even small organizations with limited resources can publish large files on
+   the Internet without having to invest in costly infrastructure.
+
+</t>
+
+<!--
+<section title="Extensions">
+<t>
+ 
+   The GTP is designed to be extensible to meet the future needs of
+   individuals and community forums. It also allows certain optional
+   features that clients may omit in their implementation. The git community has shown that
+   This document o the extent that these extensions
+   have become part of what the GitTorrent community considers best
+   practice they have been included in this document.  However, many
+   extensions have been omitted either because they have been deemed to
+   lack interoperability with existing implementations, or because they
+   are not regarded as being sufficiently mature.
+
+</t>
+</section>
+-->
+
+<section title="Audience">
+<t>
+
+   This document is aimed at developers who wish to implement GTP for a
+   particular platform. Also, system administrators and architects may
+   use this document to fully understand the implications of installing
+   an implementation of GTP. In particular, it is advised to study the
+   security implications in more detail, before installing an
+   implementation on a machine that also contains sensitive data.
+   Security implications are discussed in
+   <xref target="security-considerations" />.
+
+</t>
+<t>
+
+   It is assumed that the developers are familiar with the layout of the
+   git repository and the design of the object store. This includes the
+   use of pack files and how to validate signed tag objects.
+
+</t>
+</section>
+
+<section title="Terminology">
+<list style='hanging'>
+
+<t hangText="Peer:">
+
+	A peer is a node in a network participating in repository sharing. It
+	can simultaneously act both as a server and a client to other
+	nodes on the network.
+
+</t>
+<t hangText="Neighboring peers:">
+
+	Peers to which a client has an active point to point TCP
+	connection.
+
+</t>
+<t hangText="Client:">
+
+	A client is a user agent (UA) that acts as a peer on behalf of
+	a user.
+
+</t>
+<t hangText="Torrent:">
+
+	A torrent is the term for the group of branches the client is
+	downloading.
+
+</t>
+<t hangText="Swarm:">
+
+	A network of peers that actively operate on a given torrent.
+
+</t>
+<t hangText="Seeder:">
+
+	A peer that has a complete copy of a torrent.
+
+</t>
+<t hangText="Tracker:">
+
+	A tracker is a centralized server that holds information about one or
+	more torrents and associated swarms. It functions as a gateway for
+	peers into a swarm.
+
+</t>
+<t hangText="Metainfo file:">
+
+	A text file that holds information about the torrent, e.g. the
+	URL of the tracker. It usually has the extension .gittorrent. 
+
+</t>
+<t hangText="Peer ID:">
+
+	A 20-byte string that identifies the peer. How the peer ID is
+	obtained is outside the scope of this document, but a peer must
+	make sure that the peer ID it uses has a very high probability
+	of being unique in the swarm.
+
+	<cref>Persistence across crashes?</cref>
+
+</t>
+<t hangText="Repo hash:">
+
+       A SHA1 hash that uniquely identifies the torrent. It is calculated from
+       data in the metainfo file.
+
+</t>
+</list>
+</section>
+
+<section title="Overall Operation">
+<t>
+
+   GTP consists of two logically distinct protocols, namely the Tracker
+   HTTP Protocol (THP), and the Peer Wire Protocol (PWP). THP defines a
+   method for contacting a tracker for the purposes of joining a swarm,
+   reporting progress etc. PWP defines a mechanism for communication
+   between peers, and is thus responsible for carrying out the actual
+   download and upload of the torrent.
+
+</t>
+<t>
+
+   In order for a client to download a torrent the following steps must
+   be carried through: 
+
+</t>
+<list style="numbers">
+<t>
+
+	A metainfo file must be retrieved.
+
+</t>
+<t>
+
+	Instructions that will allow the client to contact other peers
+	must be periodically requested from the tracker using THP.
+   
+</t>
+<t>
+
+	The torrent must be downloaded by connecting to peers in the
+	swarm and trading objects using PWP.
+
+	<vspace blankLines="1" />
+</t>     
+</list>
+<t>
+
+   To publish a torrent the following steps must be taken:
+
+</t>
+<list style="numbers">
+<t>
+
+	A tracker must be set up.
+
+</t>
+<t>
+
+	A metainfo file pointing to the tracker and containing
+	information on the structure of the torrent must be produced and
+	published.
+    
+</t>
+<t>
+
+	At least one  seeder with access to the complete torrent must be set up.
+
+</t>
+</list>
+</section>
+</section> <!-- ==================================================== -->
+
+<section title="Bencoding ">
+<t>
+
+   Bencoding encodes data in a platform independent way.  In GTP/1.0 the
+   metainfo file and all responses from the tracker are encoded in the
+   bencoding format. The format specifies two scalar types (integers and
+   strings) and two compound types (lists and dictionaries).
+
+</t>
+<figure>
+<preamble>
+
+  The <xref target="RFC2234">Augmented BNF syntax</xref> for bencoding
+  format is:
+
+</preamble>
+<artwork type="abnf">
+   dictionary = "d" 1*(string anytype) "e" ; non-empty dictionary
+   list       = "l" 1*anytype "e"          ; non-empty list
+   integer    = "i" signumber "e" 
+   string     = number ":" &lt;number long sequence of any CHAR&gt;
+   anytype    = dictionary / list / integer / string
+   signumber  = "-" number / number
+   number     = 1*DIGIT
+   CHAR       = %x00-FF                    ; any 8-bit character
+   DIGIT      = "0" / "1" / "2" / "3" / "4" /
+                "5" / "6" / "7" / "8" / "9"</artwork>
+</figure>
+
+<section title="Scalar Types">
+<t>
+
+   Integers are encoded by prefixing a string containing the base ten
+   representation of the integer with the letter "i" and postfixing it
+   with the letter "e". E.g. the integer 123 is encoded as i123e.
+
+</t>
+<t>
+
+   Strings are encoded by prefixing the string content with the length
+   of the string followed by a colon. E.g. the string "announce" is
+   encoded as "8:announce".
+
+</t>
+</section>
+
+<section title="Compound Types">
+<t>
+
+   The compound types provides a mean to structure elements of any
+   bencoding type.
+
+</t>
+<t>
+
+   Lists are an arbitrary number of bencoded elements prefixed with the letter
+   "l" and postfixed with the letter "e". It follows that lists can contain
+   nested lists and dictionaries. For instance "li2e3:fooe" defines a list
+   containing the integer "2" and the string "foo".
+
+</t>
+<t>
+
+   Dictionaries are an arbitrary number of key/value pairs delimited by
+   the letter "d" at the beginning and the letter "e" at the end. All
+   keys are bencoded strings while the associated value can be any
+   bencoded element. E.g. "d5:monthi4e4:name5:aprile" defines a
+   dictionary holding the associations: "month" =&gt; "4" and "name"
+   =&gt; "april". All dictionary keys MUST be sorted alphabetically.
+
+</t>
+</section>
+</section> <!-- ==================================================== -->
+
+<section anchor="peers" title="Discovering Peers">
+<t>
+
+	Two methods exist for discovering other peers in the swarm.
+	Either peer information can be requested from the tracker, or it
+	can be requested from a neighboring peer. A tracker can be used
+	as the initial method for seeding the peer's list of other peers
+	in the swarm, after which the peer should prefer to discover
+	peers through its neighboring peer to reduce resource demands on
+	the tracker.
+
+</t>
+<t>
+
+	A peer should continously discover new peers while it is
+	connected to the swarm to find peers that provide better
+	download rates than its current neightboring peers.  Peer rating
+	and selection is discussed in <xref
+		target="peer-selection-strategy" />.  Periodically
+	connecting to new peers ill also be ensured that updates are
+	distributed through-out the swarm faster. 
+	
+
+</t>
+</section>
+
+<section anchor="references" title="Repository References">
+<t>
+
+	New tags and branch updates are announced using reference lists,
+	that contain information about what git commit SHA-1 each branch
+	is at and the name and SHA-1 of available tags. The reference
+	list enables a peer to know which revision history to trust and
+	consequently which objects to request. Since references may be
+	distributed using both THP and PWP, trust is ensured by
+	requiring that all reference information distributed in the
+	swarm is signed so that the peer may verify the signature using
+	a public key available in the metainfo file.
+
+</t>
+<t>
+
+	Repository references are distributed in a signed tag object.
+	Each new repository reference tag should refer to its successor
+	to indicate the relation between a newer and older reference
+	object. However, when a peer does not have all reference objects
+	it should should use the creation date indicated in the tag
+	object to infer a relation between two reference objects.  How
+	to verify the signed git tag is beyond the scope of this
+	document.
+
+</t>
+<t>
+
+	The format of data embedded in the tag object is the same as the
+	format of the .git/info/refs file. It is line-oriented, where
+	each line contains a SHA-1 and reference name separated by a
+	tab. Details on how peers should interpret the reference names
+	are beyond the scope of this document. Following is an example:
+
+</t>
+<figure>
+<artwork>
+bd562ca1ef05b91e6dbcddf3ace0c897ef76567e	HEAD
+bd562ca1ef05b91e6dbcddf3ace0c897ef76567e	refs/heads/master
+bd562ca1ef05b91e6dbcddf3ace0c897ef76567e	refs/heads/origin
+7113a59591aab60f979c6993bffa4cdd66236fdf	refs/tags/initial
+8dec84bb6b5eb7eb8831582dfd7ebbadb0403474	refs/tags/initial^{}
+8567d6dfb446364b823190b9e6c988f0ba72e1ba	refs/tags/review-0.1
+bdb69c0458215a761d5ae36c143a8b37cf20e103	refs/tags/review-0.1^{}
+f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
+094308b52456b21dd00988f5fc3ee3e5cb1d5a75	refs/tags/review-0.2^{}</artwork>
+</figure>
+<t>
+
+	The references object may be partial in that not all tags or
+	branches are listed in it. The entity in charge of signing the
+	references objects must make decisions regarding how to best
+	distribute the repository references. For repositories with many
+	branches or tags it may be necessary to split up the list of
+	references so as not to require big objects to be exchanged over
+	the wire. The same applies for repositories with frequent
+	updates, in that partial and smaller reference lists can help to
+	reduce the overhead of of exchanging many reference objects.
+
+</t>
+</section>
+
+<section title="Objects and Blocks">
+<t>
+
+   This section describes how a torrent is organized in objects,
+   and blocks. The torrent is divided into one or more objects. Each
+   object is named using a SHA-1 hash which allows the peer to verify
+   the contents of a single object. Using the repository references as
+   the starting point and walking all downloaded objects according to
+   the git object hierarchy the peer is able to verify the complete
+   object store. When distributing data over PWP objects are divided into
+   one or more blocks.
+
+</t>
+
+<section title="Objects">
+<t>
+
+    An object is either a single git object or a group of git objects
+    compressed into a pack object. All objects are uniquely identified
+    by a SHA-1, derived from the object content. Pack objects are
+    special in that they are accompanied by an index object listing the
+    git objects in the pack. Peers can exchange information about what
+    objects they have by first requesting the list of pack objects a
+    neighboring peer makes available and afterwards requesting the index
+    files for each pack. Although git objects may be distributed one by
+    one, it is recommended that peers primarily use packs for
+    downloading to improve overall bandwidth utilization.
+
+</t>
+<t>
+
+    The size of the individual pack objects is implementation depend.
+    As a guideline a peer should not provide packs with a size that is
+    greater than the resulting pack index object can be sent in its
+    entirety over the wire.  Also, git objects may be packed in a
+    variety of different packs resulting in the peer having many
+    different possible overlapping packs depending on how the download
+    history of the peer. This reduces changes that a pack object will be
+    available from multiple peers. Keeping the size of the pack objects
+    down ensures that a peer will have a greater change at being able to
+    both request and complete the download of the pack from one
+    neighboring peer.
+
+</t>
+</section>
+
+<section title="Blocks">
+<t>
+
+    The size of a block is an implementation defined value that is not
+    dependant on the fixed piece size. Once a fixed size is
+    defined, the number of blocks per objects can be calculated using the
+    formula:
+
+</t>
+<figure>
+<artwork>
+        number_of_blocks = (object_size / fixed_block_size)
+                         + !!(object_size % fixed_block_size)</artwork>
+</figure>
+<t>
+
+    where "%" denotes the modulus operator, and "!" the negation operator.
+    The negation operator is used to ensure that the last factor only
+    adds a value of 0 or 1 to the sum. Given the start offset of
+    the block its index within a piece can be calculated using the
+    formula:
+
+</t>
+<figure>
+<artwork>
+        block_index = block_offset % fixed_block_size</artwork>
+</figure>
+</section>
+</section> <!-- ==================================================== -->
+
+<section title="The Metainfo File">
+<t>
+
+   The metainfo file provides the client with information on the tracker
+   location as well as the torrent to be downloaded. Besides listing
+   which branches will result from downloading the torrent, it also provides
+   the client with a mean to verify branches.
+
+</t>
+<t>
+
+   In order for a client to recognize the metainfo file it SHOULD have
+   the extension .gittorrent and the associated the media type
+   "application/x-gitttorrent". How the client retrieves the metainfo
+   file is beyond the scope of this document, however, the most
+   user-friendly approach is for a client to find the file on a web
+   page, click on it, and start the download immediately. This way, the
+   apparent complexity of GTP as opposed to FTP or HTTP transfer is
+   transparent to the user.
+
+</t>
+
+<section title="The Structure of the Metainfo File">
+<t>
+
+   The metainfo file contains a bencoded dictionary with the following
+   structure. A key below is REQUIRED unless otherwise noted.
+
+</t>
+<list style="hanging">
+<t hangText="'comment':">
+
+	This is an OPTIONAL string value that may contain any comment by
+	the author of the torrent.
+
+</t>
+<t hangText="'created by':">
+
+	This is an optional string value and may contain the name and
+	version of the program used to create the metainfo file.
+
+</t>
+<t hangText="'creation date':">
+
+	This is an OPTIONAL string value. It contains the creation time
+	of the torrent in standard Unix epoch format.
+
+</t>
+<t hangText="'pubkey':">
+
+	This is a string value. It must contain the public key that is
+	used by GTP/1.0 to verify each update to a branch head.
+
+</t>
+<t hangText="'repo':">
+
+	This is a list containing a description of each branch offered
+	in the torrent.
+
+<list style="hanging">
+<t hangText="'branches':">
+
+
+	This key points to a dictionary that contains information about
+	the branches to download.
+
+<list style="hanging">
+<t hangText="'name':">
+
+	This is a string value. It contains the name of the branch.
+
+</t>
+<t hangText="'pubkey':">
+
+	This is an OPTIONAL string value. It must contain the public key
+	that is used by GTP/1.0 to verify each update to a branch head.
+	If no key is supplied the global "pubkey" value will be used for
+	verification branch updates.
+
+</t>
+<t hangText="'alternatives':">
+
+	This is an OPTIONAL list of string value. It may contain repo
+	hashes for repositories that can be used as an alternative
+	object source for this branch. This tells clients when the
+	object store of a repository can be shared between different
+	torrents.
+
+</t>
+</list>
+</t>
+<t hangText="'description':">
+
+	This is an OPTIONAL string value that may contain a description
+	of the repository. It may simply be the content from the
+	description file in the git repository.
+
+</t>
+</list>
+</t>
+<t hangText="'trackers':">
+
+	This is a list of string values. Each value is a URL
+	pointing to a tracker.
+
+</t>
+</list>
+
+</section>
+</section> <!-- ==================================================== -->
+
+<section title="The Tracker HTTP Protocol">
+<t>
+
+   The Tracker HTTP Protocol (THP) is a simple mechanism for introducing
+   peers to each other. A tracker is a HTTP service that must be
+   contacted by a peer in order to join a swarm. As such the tracker
+   constitutes the only centralized element in GTP/1.0. A tracker does
+   not by itself provide access to any downloadable data. A tracker relies on
+   peers sending regular requests. It may assume that a peer is dead if it
+   misses a request.
+
+</t>
+
+<section title="Request">
+<t>
+
+   To contact the tracker a peer MUST send a standard HTTP GET request using
+   an URL from the "trackers" entry of the metainfo file. If one of the tracker URLs
+   are not available another one may be tried. The GET request must
+   be parametrized as specified in the HTTP protocol. The following parameters
+   must be present in the request:
+
+</t>
+<list style="hanging">
+<t hangText="'repo_hash':">
+
+	This is a REQUIRED 20-byte SHA1 hash value. In order to obtain
+	this value the peer must calculate the SHA1 of the value of the
+	"branches" key in the metainfo file.
+
+</t>
+<t hangText="'peer_id':">
+
+	This is a REQUIRED string and must contain the 20-byte
+	self-designated ID of the peer.
+
+</t>
+<t hangText="'port':">
+
+	the port number that the peer is listening to for incoming
+	connections from other peers. gtp/1.0 does not specify a
+	standard port number, nor a port range to be used. this key is required.
+
+</t>
+<t hangText="'uploaded':">
+
+	This is a base ten integer value. It denotes the total amount of bytes
+	that the peer has uploaded in the swarm since it sent the "started"
+	event to the tracker. This key is REQUIRED.
+
+</t>
+<t hangText="'downloaded':">
+
+	This is a base ten integer value. It denotes the
+	total amount of bytes that the peer has downloaded in the swarm
+	since it sent the "started" event to the tracker. This key is REQUIRED.
+
+</t>
+<t hangText="'completed':">
+
+	This is a base ten integer value. The value must be 0 if the peer does
+	not have the complete torrent and 1 if it has the complete torrent.
+
+</t>
+<t hangText="'ip':">
+
+	This is an OPTIONAL value, and if present should indicate the
+	true, Internet-wide address of the peer, either in dotted quad IPv4
+	format, hexadecimal IPv6 format, or a DNS name. When not present the
+	tracker will derive the IP address from the request connection.
+
+</t>
+<t hangText="'peers':">
+
+	This is an OPTIONAL value. If present, it should indicate the
+	number of peers that the local peer wants to receive from the
+	tracker. If not present, the tracker uses an implementation
+	defined value.
+
+</t>
+<t hangText="'references':">
+
+	This is an OPTIONAL value. If present, it should indicate the
+	number of references that the local peer wants to receive from the
+	tracker. If not present, the tracker uses an implementation
+	defined value.
+
+</t>
+<t hangText="'event':">
+
+	This parameter is OPTIONAL. If not specified, the request is
+	taken to be a regular periodic request. Otherwise, it MUST have one
+	of the three following values:
+
+<list style="hanging">
+<t hangText="'started':">
+
+	The first HTTP GET request sent to the tracker MUST have this
+	value in the "event" parameter.
+
+</t>
+<t hangText="'stopped':">
+
+	This value SHOULD be sent to the tracker when the peer is shutting
+	down gracefully. 
+
+</t>
+</list>
+</t>
+</list>
+</section>
+
+<section title="Response">
+<t>
+
+   Upon receiving the HTTP GET request, the tracker MUST respond with a
+   document having the "application/x-gittorrent" MIME type. This
+   document MUST contain a bencoded dictionary with the following keys:
+
+</t>
+<list style="hanging">
+<t hangText="'failure reason':">
+
+	This key is OPTIONAL. If present, the dictionary MUST NOT contain any
+	other keys. The peer should interpret this as if the attempt to join
+	the torrent failed. The value is a human readable string containing an
+	error message with the failure reason.
+
+</t>
+<t hangText="'interval':">
+
+	A peer must send regular HTTP GET requests to the tracker to
+	obtain an updated list of peers and update the tracker of its
+	status. The value of this key indicated the amount of time
+	that a peer should wait between to consecutive regular
+	requests. This key is REQUIRED.
+    
+</t>
+<t hangText="'complete':">
+
+	This is an integer that indicates the number of seeders. This
+	key is OPTIONAL.
+
+</t>
+<t hangText="'incomplete':">
+
+	This is an integer that indicates the number of peers downloading
+	the torrent. This key is OPTIONAL.
+
+</t>
+<t hangText="'peers':">
+
+	This is a bencoded list of dictionaries containing information
+	about the peers in the swarm. This key is REQUIRED.
+
+	It has the following structure:
+
+<list style="hanging">
+<t hangText="'peer id':">
+
+	This is a REQUIRED string value containing the self-designated
+	ID of the peer.
+      
+</t>
+<t hangText="'ip':">
+
+	This is a REQUIRED string value indicating the IP address of the peer.
+	This may be given as a dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.
+
+</t>
+<t hangText="'port':">
+
+	This is an integer value. It must contain the self-designated
+	port number of the peer. This key is REQUIRED.
+
+</t>
+</list>
+</t>
+<t hangText="'references':">
+
+	This is a string value containing information about the
+	references in the repository. The value can be sent to
+	neighboring peers over the wire using the References message.
+	See <xref target="references" /> for instructions on how
+	to interpret the string.
+
+</t>
+</list>
+</section>
+</section>
+<!--
+<section title="The Tracker Scrape Convention">
+<t>
+
+   GTP provides a mechanism referred to as the tracker scrape convention
+   (TSC) for querying the state of a given torrent (or several torrents)
+   that the tracker is managing. TSC is an optional tracker extension
+   which, similar to THP, is layered as a GET request-response protocol
+   on top of HTTP. A client can use TSC to obtain and display additional
+   information about the swarms it has joined.
+
+</t>
+
+<section title="Deriving the Scrape URL">
+<t>
+
+   The scrape URL used by TSC can be derived from the announce URL
+   listed in the metainfo file using the following steps:
+
+</t>
+<list style="symbols">
+<t>
+
+	Find the last '/' in the announce URL.
+
+</t>
+<t>
+
+	Verify that the text immediately following the '/' is
+	'announce'.  If this is not the case the tracker does not
+	support TSC.
+
+</t>
+<t>
+
+	Substitute 'announce' with 'scrape'.
+
+</t>
+</list>
+<t>
+
+   When deriving the scrape URL the client MUST NOT perform entity
+   unquoting or URL decoding. Some examples for checking for TSC
+   support and deriving the scrape URL:
+
+</t>
+<figure>
+<artwork>
+   http://server/announce          -&gt; http://server/scrape
+   http://server/path/announce     -&gt; http://server/path/scrape
+   http://server/path%2fannounce   -&gt; TSC not supported
+   http://server/announce.ext      -&gt; http://server/scrape.ext
+   http://server/a                 -&gt; TSC not supported
+   http://server/announce?q=x%2fy  -&gt; http://server/scrape?q=x%2fy
+   http://server/announce?q=x/y    -&gt; TSC not supported</artwork>
+</figure>
+</section>
+
+<section title="The Scrape Request">
+<t>
+
+   A scrape GET request from a client may contain an optional
+   "repo_hash" parameter in the query part similar to THP requests. This
+   can be used to restrict the response to a particular torrent. If
+   the parameter is left out the response will contain information for
+   all the torrents a tracker is serving. Clients are strongly advised
+   to use this facility to lessen the load on the tracker.
+
+</t>
+</section>
+
+<section title="The Scrape Response">
+<t>
+
+   The scrape response is a document with the media type "text/plain"
+   consisting of a bencoded dictionary with the following keys:
+
+</t>
+<list style="hanging">
+<t hangText="'files':">
+
+	This is a REQUIRED dictionary. Each key in the dictionary is an
+	repo_hash string associated with a torrent served by the
+	tracker.  The corresponding value is a dictionary with the
+	following structure:
+
+<list style="hanging">
+<t hangText="'complete':">
+
+	This is an integer indicating the number of seeder. This key is
+	REQUIRED.
+
+</t>
+<t hangText="'downloaded':">
+
+	This is an integer indicating the total number of times a peer
+	has reported a completed download to the tracker.This key is
+	REQUIRED.
+
+</t>
+<t hangText="'incomplete':">
+
+	This is an integer indicating the number of leechers. This key
+	is REQUIRED.
+
+</t>
+<t hangText="'name':">
+
+	This is an OPTIONAL string containing the same value as the
+	'name' specified in the metainfo files 'info' dictionary.
+
+</t>
+</list>
+</t>
+</list>
+<t>
+
+   If an "repo_hash" parameter was sent in the scrape request the
+   'files' dictionary will contain only a single dictionary. Else a
+   dictionary for each torrent the tracker is serving is returned.
+
+</t>
+</section>
+</section>
+</section- ==================================================== -->
+
+<section title="The Peer Wire Protocol">
+<t>
+
+   The aim of the PWP, is to facilitate communication between
+   neighboring peers for the purpose of sharing the content of a git
+   repository.  PWP describes the steps taken by a peer after it has
+   read in a metainfo file and contacted a tracker to gather information
+   about other peers it may communicate with. PWP is layered on top of
+   TCP and handles all its communication using asynchronous messages.
+
+</t>
+
+<section title="Peer Wire Guidelines" anchor="peer-wire-guidelines">
+<t>
+
+   PWP does not specify a standard algorithm for selecting elements from
+   a clients neighboring peers with whom to share pieces, although the
+   following guidelines are expected to be observed by any such
+   algorithm:
+
+</t>
+<list style="symbols">
+<t>
+
+	  The algorithm should not be constructed with the goal in mind
+	  to reduce the amount of data uploaded compared to
+	  downloaded. At the very least a peer should upload the same
+	  amount that it has downloaded.
+
+</t>
+<t>
+  
+	  The algorithm should not use a strict tit-for-tat schema when
+	  dealing with remote peers that have just joined the swarm
+	  and thus have no objects to offer.
+
+</t>
+<t>
+
+	  The algorithm should make good use of both download and upload
+	  bandwidth by putting a cap on the number of simultaneous
+	  connection that actively send or receive data. By reducing the
+	  number of active connections, TCP congestion can be avoided.
+
+</t>
+<t>
+         The algorithm should pipeline data requests in order so saturate
+         active connections.
+</t>
+<t>
+
+	  The algorithm should be able to cooperate with peers that
+	  implement a different algorithm.
+
+</t>
+
+</list>
+</section>
+
+<section title="Handshaking">
+<t>
+
+   The local peer opens a port on which to listen for incoming
+   connections from remote peers. This port is then reported to the
+   tracker. As GTP/1.0 does not specify any standard port for listening, it is
+   the sole responsibility of the implementation to select a port.
+
+</t>
+<t> 
+
+   Any remote peer wishing to communicate with the local peer must open
+   a TCP connection to this port and perform a handshake operation. The
+   handshake operation MUST be carried out before any other data is sent
+   from the remote peer. The local peer MUST NOT send any data back to
+   the remote peer before a well constructed handshake has been
+   recognized according to the rules below. If the handshake in any way
+   violates these rules the local peer MUST close the connection with
+   the remote peer.
+
+</t>
+<!-- t>
+	&nbsp;
+</t>
+<t>
+	&nbsp;
+</t-->
+<t>
+
+
+   A handshake is a string of bytes with the following structure:
+
+</t>
+<figure>
+<artwork>
+-----------------------------------------------------------------------
+| Name Length | Protocol Name | Extension Flags | Repo Hash | Peer ID |
+-----------------------------------------------------------------------</artwork>
+</figure>
+<list style="hanging">
+<t hangText="Name Length:">
+
+	The unsigned value of the first byte indicates the length of a
+	character string containing the protocol name. In GTP/1.0 this
+	number is 19. The local peer knows its own protocol name and
+	hence also the length of it. If this length is different than
+	the value of this first byte, then the connection MUST be
+	dropped.
+
+</t>
+<t hangText="Protocol Name:">
+
+	This is a character string which MUST contain the exact name of
+	the protocol in ASCII and have the same length as given in the
+	Name Length field. The protocol name is used to
+	identify to the local peer which version of GTP the remote peer
+	uses. In GTP/1.0 the name is 'GitTorrent protocol'. If this
+	string is different from the local peers own protocol name, then
+	the connection is to be dropped.
+
+</t>
+<t hangText="Extension Flags:">
+
+	The next 8 bytes in the string are reserved for future
+	extensions, so that peers can exchange information about what
+	optional features they implement. Peers should interpret it
+	according to what extensions they support else it should be
+	read without interpretation.
+
+</t>
+<t hangText="Repo Hash:">
+
+	The next 20 bytes in the string are to be interpreted as a
+	20-byte SHA1 of the info key  in the metainfo file.
+	Presumably, since both the local and the remote peer contacted
+	the tracker as a result of reading in the same .torrent file,
+	the local peer will recognize the repo hash value and will be
+	able to serve the remote peer. If this is not the case, then the
+	connection MUST be dropped. This situation can arise if the
+	local peer decides to no longer serve the file in question for
+	some reason. The branches hash may be used to enable the client to
+	serve multiple torrents on the same port.
+
+</t>
+<t>
+
+	At this stage, if the connection has not been dropped, then the
+	local peer MUST send its own handshake back, which includes the
+	last step:
+
+</t>
+<t hangText="Peer ID:">
+
+	The last 20 bytes of the handshake are to be interpreted as the
+	self-designated name of the peer.  The local peer must use this
+	name to identify the connection hereafter. Thus, if this name matches
+	the local peers own ID name, the connection MUST be dropped.  Also, if
+	any other peer has already identified itself to the local peer using
+	that same peer  ID, the connection MUST be dropped.
+
+</t>
+</list>
+<t>
+
+   In GTP/1.0 the handshake has a total of 68 bytes.
+
+</t>
+</section>
+
+<section title="Message Communication">
+<t>
+
+   Following the PWP handshake both ends of the TCP channel may send
+   messages to each other in a completely asynchronous fashion. PWP
+   messages have the dual purpose of updating the state of neighboring
+   peers with regard to changes in the local peer, as well as transferring
+   data blocks between neighboring peers. 
+
+</t>
+<t>
+
+   PWP Messages fall into two different categories:
+
+</t>
+<list style="hanging">
+<t hangText="State-oriented messages:">
+
+	These messages serve the sole purpose of informing peers of
+	changes in the state of neighboring peers. A message of this
+	type MUST be sent whenever a change occurs in a peer's state,
+	regardless of the state of other peers. The following messages
+	fall into this category: Interested, Uninterested, Choked,
+	Unchoked, References, Packs, Index, and Peers.
+
+</t>
+<t hangText="Data-oriented messages:">
+
+	These messages handle the requesting and sending of data
+	portions. The following messages fall into this category:
+	Request, Cancel and Piece.
+
+</t>
+</list>
+<section title="Peer States">
+<t>
+
+   For each end of a connection, a peer must maintain the following two
+   state flags:
+
+</t>
+<list style="hanging">
+<t hangText="Choked:">
+
+   When true, this flag means that the choked peer is not allowed to request data.
+
+</t>
+<t hangText="Interested:">
+
+   When true, this flag means a peer is interested in requesting data from
+   another peer. This indicates that the peer will start requesting blocks
+   if it is unchoked.
+
+</t>
+</list>
+<t>
+   A choked peer MUST not send any data-oriented messages, but is free to send
+   any other message to the peer that has choked it. If a peer chokes a remote
+   peer, it MUST also discard any unanswered requests for blocks
+   previously received from the remote peer.
+</t>
+<t>
+  An unchoked peer is allowed to send data-oriented messages to the
+  remote peer. It is left to the implementation how many peers any given peer
+  may choose to choke or unchoke, and in what fashion. This is done deliberately
+  to allow peers to use different heuristics for peer selection.
+</t>
+<t>
+  An interested peer indicates to the remote peer that it must expect to
+  receive data-oriented messages as soon as it unchokes the interested peer. It
+  must be noted, that a peer must not assume a remote peer is interested solely
+  because it has pieces that the remote peer is lacking. There may be valid
+  reasons why a peer is not interested in another peer other than data-based
+  ones.
+</t>
+</section>
+</section>
+<section title="Peer Wire Messages">
+<t>
+
+   All integer members in PWP messages are encoded as a 4-byte
+   big-endian number. Furthermore, all object block specific offset
+   members in PWP messages are zero-based.
+
+</t>
+<t>
+
+   A PWP message has the following structure:
+
+</t>
+<figure>
+<artwork>
+-----------------------------------------
+| Message Length | Message ID | Payload |
+-----------------------------------------</artwork>
+</figure>
+<list style="hanging">
+<t hangText="Message Length:">
+
+	This is an integer which denotes the length of the message,
+	excluding the length part itself. If a message has no payload, its size is 1.
+	Messages of size 0 MAY be sent periodically as keep-alive
+	messages. Apart from the limit that the four bytes impose on the
+	message length, GTP does not specify a maximum limit on this
+	value.  Thus an implementation MAY choose to specify a different
+	limit, and for instance disconnect a remote peer that wishes to
+	communicate using a message length that would put too much
+	strain on the local peer's resources. 
+
+</t>
+<t hangText="Message ID:">
+
+	This is a one byte value, indicating the type of the message.
+	GTP/1.0 specifies 9 different messages, as can be seen further
+	below.
+
+</t>
+<t hangText="Payload:">
+
+	The payload is a variable length stream of bytes.
+
+</t>
+</list>
+<t>
+
+   If an incoming message in any way violates this structure then the
+   connection SHOULD be dropped.  In particular the receiver SHOULD make
+   sure the message ID constitutes a valid message, and the payload
+   matches the the expected payload, as given below. 
+
+</t>
+<t>
+
+   For the purpose of compatibility with future protocol extensions the
+   client SHOULD ignore unknown messages. There may arise situations in
+   which a client may choose to drop a connection after receiving an
+   unknown message, either for security reasons, or because discarding
+   large unknown messages may be viewed as excessive waste.
+
+</t>
+<t>
+
+	Following, are the messages specified in GTP/1.0.
+
+</t>
+</section>
+
+<section title="State-oriented Messages">
+<section title="Choke">
+<t>
+
+	This message has ID 0 and no payload. A peer sends this message
+	to a remote peer to inform the remote peer that it is being
+	choked. 
+</t>
+</section>
+<section title="Unchoke">
+<t>
+
+	This message has ID 1 and no payload. A peer sends this message
+	to a remote peer to inform the remote peer that it is no longer
+	being choked.
+	   
+
+</t>
+</section>
+<section title="Interested">
+<t>
+
+	This message has ID 2 and no payload. A peer sends this message
+	to a remote peer to inform the remote peer of its desire to
+	request data.
+
+
+</t>
+</section>
+<section title="Uninterested">
+<t>
+
+	This message has ID 3 and no payload. A peer sends this message
+	to a remote peer to inform it that it is not interested in any
+	pieces from the remote peer. 
+
+</t>
+</section>
+<!-- /section>
+
+	<vspace blankLines="4" />
+	
+	and guidelines regarding Reference
+	messages.
+
+<section title="Repository-oriented Messages" -->
+<section title="Peers">
+<t>
+
+	This message has ID 4 and a variable payload length. The payload
+	is a list of peers each with their self-designated peer ID, port
+	number, and the IP address of the peer.  This may be given as a
+	dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.  A
+	peer can send this message with no payload to requesting the
+	references from the remote peer.  See <xref target="peers" />
+	for guidelines for using Peers messages.
+
+<figure>
+<artwork>
+-----------------------------------------------------------
+| Peer SHA-1 | Peer Port | Peer IP Length | Peer IP | ... |
+-----------------------------------------------------------</artwork>
+</figure>
+</t>
+</section>
+<section title="References">
+<t>
+
+	This message has ID 5 and a variable payload. To request
+	references from the remote peer, a peer can send this message
+	with no payload. To announce to the other peer that it has a
+	new reference object available it can send this message with a
+	reference SHA-1 and an empty object. A peer should newer send
+	its current reference object unless it has requested using
+	this method.  This reduces the impact of new reference object
+	being flooded in the network.
+
+</t>
+<t>
+
+	The reference object is similar to the "references" string
+	returned in the tracker response. A peer receiving this
+	message must validate the resulting object using the public
+	key from the metainfo file and drop the connection if the
+	object has a false signature. See <xref target="references" />
+	for more instructions on how to interpret the reference
+	object.
+
+</t>
+<figure>
+<artwork>
+----------------------------------------------
+| Reference Object SHA-1 | References Object |
+----------------------------------------------</artwork>
+</figure>
+</section>
+<section title="Packs">
+<t>
+
+	This message has ID 6 and a variable payload length. The
+	payload is a list of pack objects that the sender has
+	successfully downloaded, validated, and is offering.  Each pack
+	file is listed with a SHA-1 uniquely identifying it, a 8-byte
+	big-endian number telling the size of the pack file, and finally
+	a 1-byte flag field. In all, 29 bytes per embedded pack object.
+	A peer can send this message with no payload to requesting the
+	references from the remote peer. 
+
+</t>
+<t>
+	
+	The flag member holds information about what type of git objects
+	are in the pack. This can be used by peers to fetch the various
+	objects in a specific order, such as first downloading all
+	commit objects. The following bit flags are defined: 0-bit is
+	tag objects, 1-bit is commit objects, 2-bit is tree objects, and
+	3-bit is blob objects. The flag byte is interpreted in
+	MSB-order. If no flags are set the pack object may contain any
+	combination of objects.
+
+</t>
+<t>
+	
+	A peer receiving this message SHOULD send an index
+	message to the sender to keep it informed of any new objects
+	the remote peer has downloaded.
+
+<figure>
+<artwork>
+---------------------------------------------
+| Pack SHA-1 | Pack size | Pack Flags | ... |
+---------------------------------------------</artwork>
+</figure>
+</t>
+</section>
+<section title="Index">
+<t>
+
+	This message has ID 7 and a variable payload. The payload always
+	contains a pack SHA-1. If no index data is sent the receiving
+	peer should interpret it as a request for the pack index,
+	otherwise the data of the pack index object follows. The
+	recipient MUST only send index object messages to a sender that
+	has already requested the index object. A peer receiving this
+	message MUST send an interested message to the sender if indeed
+	it lacks any of the objects that are announced.  Further, it MAY
+	also send a request for that pack or object.  The payload has
+	the following structure:
+
+<figure>
+<artwork>
+---------------------------
+| Pack SHA-1 | Index Data |
+---------------------------</artwork>
+</figure>
+</t>
+</section>
+</section>
+
+<section title="Data-oriented Messages">
+<section title="Request">
+<t>
+
+	This message has ID 8 and a payload of length 28. The payload is
+	first an object SHA-1 and two integers indicating a block within
+	an object that the sender is interested in downloading from the
+	recipient. The recipient MUST only send object messages to a
+	sender that has already requested it, and only in accordance to
+	the rules given above about the choke and interested states. The
+	payload has the following structure:
+
+<figure>
+<artwork>
+----------------------------------------------
+| Object SHA-1 | Block Offset | Block Length |
+----------------------------------------------</artwork>
+</figure>
+
+</t>
+</section>
+<section title="Block">
+<t>
+
+	This message has ID 9 and a variable length payload. The payload
+	holds an object SHA-1 and an integer indicating from which
+	object and with what offset the block data in the 3rd member is
+	derived. Note, the data length is implicit and can be calculated
+	from the total message length. The payload has the following
+	structure:
+
+<figure>
+<artwork>
+--------------------------------------------
+| Object SHA-1 | Block Offset | Block Data |
+--------------------------------------------</artwork>
+</figure>
+</t>
+</section>
+<section title="Cancel">
+<t>
+
+	This message has ID 10 and a payload of length 28. The payload
+	is one object SHA-1 nad two integer values indicating a block
+	within an object that the sender has requested, but is no
+	longer interested in. The recipient MUST erase the request
+	information upon receiving this messages. The payload has the
+	following structure:
+
+<figure>
+<artwork>
+----------------------------------------------
+| Object SHA-1 | Block Offset | Block Length |
+----------------------------------------------</artwork>
+</figure>
+
+</t>
+</section>
+</section>
+
+<section title="The End Game">
+<t>
+
+   Towards the end of a download session, it may speed up the download
+   to send request messages for the remaining objects to all the
+   neighboring peers. A client must issue cancel messages to all pending
+   requests sent to neighboring peers as soon as an object is downloaded
+   successfully. This is referred to as the end game.
+
+</t>
+<t>
+
+   A client usually sends requests for blocks in stages; sending
+   requests for newer blocks as replies for earlier requests are
+   received. The client enters the end game, when all remaining objects have
+   been requested.
+
+</t>
+</section>
+
+<section title="Object Selection Strategy">
+<t>
+
+   GTP/1.0 does not force a particular order for selecting which objects
+   to download. However, experience shows that downloading in
+   rarest-first order seems to lessen the wait time for objects. To find
+   the rarest objects a client must calculate for each commit object the
+   number of times this index is true in the commit bitfield vectors of
+   all the neighboring peers. The object with the lowest sum is then
+   selected for requesting.
+
+</t>
+</section>
+
+<section anchor="peer-selection-strategy" title="Peer Selection Strategy">
+<t>
+
+   This section describes the choking algorithm recommended for selecting
+   neighboring peers with whom to exchange objects.  Implementations are
+   free to implement any strategy as long as the guidelines in 
+   <xref target="peer-wire-guidelines" /> are observed.
+</t>
+<t>
+
+   After the initial handshake both ends of a connection set the
+   Choked flag to true and the Interested flag to false.
+
+</t>
+<t>
+   All connections are periodically rated in terms of their ability
+   to provide the client with a better download rate.  The rating may take
+   into account factors such as the remote peers willingness to maintain
+   an unchoked connection with the client over a certain period of time,
+   the remote peers upload rate to the client and other implementation
+   defined criteria.   
+</t>  
+
+<t>
+ The peers are sorted according to their rating with regard to the
+   above mentioned scheme. Assume only 5 peers are allowed to download at the
+   same time. The peer selection algorithm will now unchoke as many of the
+   best rated peers as necessary so that exactly 5 of these are interested. If
+   one of the top rated peers at a later stage becomes interested, then the
+   peer selection algorithm will choke the the worst unchoked peer. Notice that
+   the worst unchoked peer is always interested.
+
+</t>
+<t>
+
+   The only lacking element from the above algorithm is the capability
+   to ensure that new peers can have a fair chance of downloading a
+   object, even though they would evaluate poorly in the above schema.
+   A simple method is to make sure that a random peer is selected
+   periodically regardless of how it evaluates. Since this process is repeated in a round
+   robin manner, it ensures that ultimately even new peers will have a
+   chance of being unchoked.
+
+</t>
+</section>
+</section> <!-- ==================================================== -->
+
+<section title="Security Consideration" anchor="security-considerations">
+<t>
+
+   
+   This section examines security considerations for GTP/1.0.The
+   discussion does not include definitive solutions to the problems
+   revealed, though it does make some suggestions for reducing
+   security risks.
+
+</t>
+
+<section title="Tracker HTTP Protocol Issues">
+<t>
+
+   The use of the HTTP protocol for communication between the tracker
+   and the client makes GTP/1.0 vulnerable to the attacks mentioned in
+   the security consideration section of
+   <xref target="RFC2616">RFC 2616</xref>.
+
+</t>
+</section>
+
+<section title="Denial of Service Attacks on Trackers">
+<t>
+
+   The nature of the tracker is to serve many clients. By mounting a
+   denial of service attack against the tracker the swarm attached to
+   the tracker can be starved. This type of attack is hard to defend
+   against, however, the metainfo file allows for multiple trackers to
+   be specified, making it possible to spread the load on a number of
+   trackers, and thus containing such an attack. 
+
+</t>
+</section>
+
+<section title="Peer Identity Issues">
+<t>
+
+   There is no strong authentication of clients when they contact the
+   tracker. The main option for trackers is to check peer ID and the
+   IP address of the client. The lack of authentication can be used to
+   mount an attack where a client can shut down another client if the
+   two clients are running on the same host and thus are sharing the
+   same IP address.
+
+   In addition, a rogue peer may masquerade its identity by using multiple
+   peer IDs. Clients should there refrain from taking the peer ID at face
+   value.
+
+</t>
+</section>
+
+<section title="DNS Spoofing">
+<t>
+
+   Clients using GTP/1.0 rely heavily on the Domain Name Service,
+   which can be used for both specifying the URI of the tracker and how
+   to contact a peer.  Clients are thus generally prone to security
+   attacks based on the deliberate mis-association of IP addresses and
+   DNS names. Clients need to be cautious in assuming the continuing
+   validity of an IP address/DNS name association.
+
+</t>
+<t>
+
+   In particular, GTP/1.0 clients SHOULD rely on their name resolver
+   for confirmation of an IP number/DNS name association, rather than
+   caching the result of previous host name lookups. If clients cache
+   the results of host name lookups in order to achieve a performance
+   improvement, they MUST observe the TTL information reported by DNS.
+
+</t>
+<t>
+
+   If clients do not observe this rule, they could be spoofed when a
+   previously-accessed peers or trackers IP address changes. As network
+   renumbering is expected to become increasingly common according to
+   <xref target="RFC1900">RFC 1900</xref>, the possibility of this form
+   of attack will grow. Observing this requirement reduces this
+   potential security vulnerability.
+
+</t>
+</section>
+
+<section title="Issues with File and Directory Names">
+<t>
+
+   The metainfo file provides a way to suggest a name of the downloaded
+   branches for torrents. GTP clients SHOULD verify that the suggested
+   file names in the metainfo file do not compromise services on the
+   local system when translated to a path in the repository structure.
+
+</t>
+<t>
+
+   Using UNIX as an example, some hazards would be:
+
+</t>
+<list style="symbols">
+<t>
+
+	Creating startup files (e.g., ".login").
+
+</t>
+<t>
+
+	Creating or overwriting system files (e.g., "/etc/passwd").
+
+</t>
+<t>
+
+	Overwriting any existing file.
+
+</t>
+</list>
+<t>
+
+   It is very important to note that this is not an exhaustive list; it
+   is intended as a small set of examples only. Implementers must be
+   alert to the potential hazards on their target systems. In general,
+   the GTP client SHOULD NOT name or place files such that they
+   will get interpreted or executed without the user explicitly
+   initiating the action.
+
+</t>
+</section>
+
+<section title="Validating the Integrity of Data Exchanged Between Peers">
+<t>
+
+   By default, all content served to the client from other peers should
+   be considered tainted and the client SHOULD validate the integrity of
+   the data before accepting it. The metainfo file contains information
+   for checking both individual objects using SHA1, and optionally individual files
+   using MD5. SHA1, being the strongest of the two, is preferred.
+   Furthermore, sole reliance on whole-file checking can potentially
+   render otherwise valid objects invalid, and should only be considered
+   for small files, to limit the amount of data being discarded.
+
+</t>
+<t>
+
+   Trusting the validity of the resulting repository ends up being a
+   matter of trusting the content of the metainfo file and branch
+   updates from the tracker. Ensuring the validity of the metainfo file
+   is beyond the scope of this document.
+
+</t>
+</section>
+
+<section title="Transfer of Sensitive Information">
+<t>
+
+   Some clients include information about themselves when generating
+   the peer ID string. Clients should be aware that this information
+   can potentially be used to determine whether a specific client has
+   a exploitable  security hole.
+
+</t>
+</section>
+
+</section> <!-- ==================================================== -->
+
+<section anchor="IANA" title="IANA Considerations">
+	<t>This document makes no request of IANA.</t>
+</section>
+</middle>
+<back> <!-- =================================== -->
+
+<references>
+
+&rfc0959;
+&rfc1900;
+&rfc2119;
+&rfc2183;
+&rfc2234;
+&rfc2616;
+
+</references>
+
+<!--
+<section title="Sample Conversations">
+
+<section title="Example 1 - Peer Connection Establishment">
+<figure>
+<preamble></preamble>
+<artwork><![CDATA[
+	Peer #1                          Peer #2
+					 (Listen at TCP port)
+	Send handshake message	    - - >  Receive handshake message
+					 (Verify handshake message)
+	Recieve handshake message  <- -   Send handshake message
+	(Verify handshake message)
+	Send bitfield message	    - - >  Receive bitfield message
+	Receive bitfield message   <- -   Send bitfield message
+]]></artwork>
+</figure>
+</section>
+
+<section title="Example 2 - Piece Requesting and Exchange">
+<figure>
+<preamble></preamble>
+<artwork><![CDATA[
+	Peer #1                          Peer #2
+	Send request message	    - - >  Receive request message
+	(Queue request)			 (Queue request)
+		...				...
+	Recieve object message      <- -   Send object message
+		...				...
+	(Verify object SHA1)
+]]></artwork>
+</figure>
+</section>
+</section> <!- - ==================================================== - - >
+-->
+
+</back>
+</rfc>
