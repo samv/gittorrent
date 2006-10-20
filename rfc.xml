@@ -1483,7 +1483,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	peer should interpret it as a request for the pack index,
 	otherwise the data of the pack index object follows. The
 	recipient MUST only send index object messages to a sender that
-	has already requested the index object. A peer receiving this
+	has already requested the index object.
+	
+</t>
+<t>
+	
+	A peer receiving this
 	message MUST send an interested message to the sender if indeed
 	it lacks any of the objects that are announced.  Further, it MAY
 	also send a request for that pack or object if it not choked by the remote peer.  The payload has
