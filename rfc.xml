@@ -36,34 +36,35 @@
 <abstract>
 <t>
 
-   This document describes the GitTorrent Protocol version 1.0 referred
+   This document describes the GitTorrent Protocol version 1.0, referred
    to as "GTP/1.0". The GitTorrent Protocol (GTP) is a protocol for
    collaborative git repository distribution across the Internet. It is
    best classified as a peer-to-peer (P2P) protocol, although it also
-   contains highly centralized elements.
+   contains centralized elements.
 
 </t>
 <t>
 
    Git is a decentralized version control system (VCS) created in the
-   begining of 2005 by Linus Torvalds. To date only client-server based
-   distribution has been supported. Although git is able to densly
+   beginning of 2005 by Linus Torvalds. To date only client-server based
+   distribution has been supported. Although git is already able to densely
    exchange updates between repositories and thereby minimize the
-   overall resource requirements for distributing git repositories
-   distribution will occationally involve clients cloning a complete
-   repository. This poses much strain on sites hosting many git
+   overall resource requirements for distribution,
+   this will occasionally involve clients cloning a complete
+   repository. This places much strain on sites hosting many git
    repositories in terms of request-processing and sheer bandwidth.  It
-   is the goal of GTP to facilitate such hosting services in reducing
+   is the goal of GTP to facilitate mirroring of such hosting services by reducing
    resource demands.
 
 </t>
 <t>
 
    Normally a client does not use their upload capacity while downloading
-   a repository. The GTP approach The GTP approach capitalizes on this
+   a repository. The GTP approach capitalizes on this
    fact by having clients upload bits of the repository data to each
-   other. In comparison to the original client-server distribution this
+   other. In comparison to the original client-server distribution, this
    adds huge scalability and cost-management advantages.
+<!-- also, mirrors are automatically used... -->
   
 </t>
 </abstract>
@@ -85,23 +86,27 @@
 
    The existing distribution protocols provides secure and reliable
    transmission of large git repositories over the Internet. However,
-   its highly centralized client-server approach also means, it is
-   inadequate for mass publication of files, where a single point may
-   expect to be requested by a critically large number of clients
-   simultaneously. To remedy this situation many organizations either
+   its highly centralized client-server approach also means that it is
+   inadequate for mass publication of files.  A single point will
+   receive requests from a critically large number of clients
+   simultaneously. To remedy this situation, many organizations either
    implement a cap on the number of simultaneous requests, or spread the
-   load on multiple mirror servers. Needless to say both approaches have
+   load across multiple mirror servers. Needless to say, both approaches have
    their drawbacks, and a solution that addresses these problems is
-   highly needed.
+   required.
 
 </t>
 <t>
 
-   The approach in GitTorrent Protocol (GTP) is to spread the load not on
-   mirror servers, but to the clients themselves by having them upload bits of
+<!-- IMO, the major benefit may actually come from the ability to set
+     up mirrors and have them replicate automatically... so I've
+     changed terms like "not mirrors" to "not only mirrors" -->
+
+   The approach in the GitTorrent Protocol (GTP) is to spread the load not only across
+   mirror servers, but across the clients themselves, by having them upload pieces of
    the file to each other while downloading it.  Since the clients usually do
    not utilize their upload capacity while fetching a file, this approach does
-   not put the clients in any disadvantage. This has the added advantage that
+   not disadvantage the clients. This has the added advantage that
    even small organizations with limited resources can publish large files on
    the Internet without having to invest in costly infrastructure.
 
@@ -110,11 +115,13 @@
 <!--
 <section title="Extensions">
 <t>
+
+<!-- this should be reworded to express the true heritage of the
+     protocol, not just cut and pasted from BitTorrent -->
  
    The GTP is designed to be extensible to meet the future needs of
    individuals and community forums. It also allows certain optional
-   features that clients may omit in their implementation. The git community has shown that
-   This document o the extent that these extensions
+   features that clients may omit in their implementation. The git community has shown that the extent that these extensions
    have become part of what the GitTorrent community considers best
    practice they have been included in this document.  However, many
    extensions have been omitted either because they have been deemed to
@@ -139,6 +146,10 @@
 
 </t>
 <t>
+
+<!-- yeah.  a shame there's no RFC for that, perhaps pointing to the
+     ASCII document detailing all of the file formats would be useful
+     here. -->
 
    It is assumed that the developers are familiar with the layout of the
    git repository and the design of the object store. This includes the
@@ -171,8 +182,9 @@
 </t>
 <t hangText="Torrent:">
 
-	A torrent is the term for the group of branches the client is
-	downloading.
+<!-- not just the ones being downloaded... -->
+	A torrent is the term for a group of branches that are being
+	shared, and all of their associated objects.
 
 </t>
 <t hangText="Swarm:">
@@ -210,8 +222,16 @@
 </t>
 <t hangText="Repo hash:">
 
+<!-- could even refer to the SHA1 spec here ... -->
        A SHA1 hash that uniquely identifies the torrent. It is calculated from
-       data in the metainfo file.
+       digesting the content of the metainfo file.
+
+</t>
+<t hangText="Object ID:">
+
+       A SHA1 hash that uniquely identifies an object in a git
+       repository.  This is similar to a SHA1 digest of the object,
+       but it is seeded with the object type and length.
 
 </t>
 </list>
@@ -223,7 +243,7 @@
    GTP consists of two logically distinct protocols, namely the Tracker
    HTTP Protocol (THP), and the Peer Wire Protocol (PWP). THP defines a
    method for contacting a tracker for the purposes of joining a swarm,
-   reporting progress etc. PWP defines a mechanism for communication
+   reporting progress, notifying branch additions, etc. PWP defines a mechanism for communication
    between peers, and is thus responsible for carrying out the actual
    download and upload of the torrent.
 
@@ -315,14 +335,14 @@
 
    Integers are encoded by prefixing a string containing the base ten
    representation of the integer with the letter "i" and postfixing it
-   with the letter "e". E.g. the integer 123 is encoded as i123e.
+   with the letter "e". E.g. the integer 123 is encoded as "i123e".
 
 </t>
 <t>
 
    Strings are encoded by prefixing the string content with the length
-   of the string followed by a colon. E.g. the string "announce" is
-   encoded as "8:announce".
+   of the string <!-- in ... bytes? --> followed by a colon. E.g. the string "announce" is
+   encoded as "8:announce". <!-- and the encoding is... ? -->
 
 </t>
 </section>
@@ -349,7 +369,7 @@
    keys are bencoded strings while the associated value can be any
    bencoded element. E.g. "d5:monthi4e4:name5:aprile" defines a
    dictionary holding the associations: "month" =&gt; "4" and "name"
-   =&gt; "april". All dictionary keys MUST be sorted alphabetically.
+   =&gt; "april". All keys within a dictionary MUST be sorted alphabetically.
 
 </t>
 </section>
@@ -360,22 +380,24 @@
 
 	Two methods exist for discovering other peers in the swarm.
 	Either peer information can be requested from the tracker, or it
-	can be requested from a neighboring peer. A tracker can be used
+	can be requested from a neighboring peer. A tracker MAY be used
 	as the initial method for seeding the peer's list of other peers
-	in the swarm, after which the peer should prefer to discover
+	in the swarm, after which the peer SHOULD prefer to discover
 	peers through its neighboring peer to reduce resource demands on
 	the tracker.
 
 </t>
 <t>
 
-	A peer should continously discover new peers while it is
+	A peer SHOULD continously discover new peers while it is
 	connected to the swarm to find peers that provide better
 	download rates than its current neightboring peers.  Peer rating
 	and selection is discussed in <xref
 		target="peer-selection-strategy" />.  Periodically
-	connecting to new peers ill also be ensured that updates are
-	distributed through-out the swarm faster. 
+	connecting to new peers will also help ensure that torrents are
+	distributed throughout the swarm faster.  Seeders SHOULD
+	reduce or eliminate this activity, to avoid idle usage of
+	bandwidth.
 	
 
 </t>
