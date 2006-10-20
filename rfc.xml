@@ -1794,10 +1794,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <references>
 
-&rfc0959;
 &rfc1900;
 &rfc2119;
-&rfc2183;
 &rfc2234;
 &rfc2616;
 
