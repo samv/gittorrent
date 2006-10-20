@@ -484,7 +484,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    This section describes how a torrent is organized in objects,
    and blocks. The torrent is divided into one or more objects. Each
-   object is named using a SHA-1 hash which allows the peer to verify
+   object is named using a SHA1 hash which allows the peer to verify
    the contents of a single object. Using the repository references as
    the starting point and walking all downloaded objects according to
    the git object hierarchy the peer is able to verify the complete
@@ -498,7 +498,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
     An object is either a single git object or a group of git objects
     compressed into a pack object. All objects are uniquely identified
-    by a SHA-1, derived from the object content. Pack objects are
+    by a SHA1, derived from the object content. Pack objects are
     special in that they are accompanied by an index object listing the
     git objects in the pack. Peers can exchange information about what
     objects they have by first requesting the list of pack objects a
@@ -1382,9 +1382,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
------------------------------------------------------------
-| Peer SHA-1 | Peer Port | Peer IP Length | Peer IP | ... |
------------------------------------------------------------</artwork>
+----------------------------------------------------------
+| Peer SHA1 | Peer Port | Peer IP Length | Peer IP | ... |
+----------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
@@ -1395,7 +1395,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	references from the remote peer, a peer can send this message
 	with no payload. To announce to the other peer that it has a
 	new reference object available it can send this message with a
-	reference SHA-1 and an empty object. A peer should newer send
+	reference SHA1 and an empty reference object. A peer should never send
 	its current reference object unless it has requested using
 	this method.  This reduces the impact of new reference object
 	being flooded in the network.
@@ -1414,9 +1414,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <figure>
 <artwork>
-----------------------------------------------
-| Reference Object SHA-1 | References Object |
-----------------------------------------------</artwork>
+---------------------------------------------
+| Reference Object SHA1 | References Object |
+---------------------------------------------</artwork>
 </figure>
 </section>
 <section title="Packs">
@@ -1425,7 +1425,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This message has ID 6 and a variable payload length. The
 	payload is a list of pack objects that the sender has
 	successfully downloaded, validated, and is offering.  Each pack
-	file is listed with a SHA-1 uniquely identifying it, a 8-byte
+	file is listed with a SHA1 uniquely identifying it, a 8-byte
 	big-endian number telling the size of the pack file, and finally
 	a 1-byte flag field. In all, 29 bytes per embedded pack object.
 	A peer can send this message with no payload to requesting the
@@ -1452,9 +1452,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
----------------------------------------------
-| Pack SHA-1 | Pack size | Pack Flags | ... |
----------------------------------------------</artwork>
+--------------------------------------------
+| Pack SHA1 | Pack size | Pack Flags | ... |
+--------------------------------------------</artwork>
 </figure>
 </t>
 </section>
@@ -1462,7 +1462,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 7 and a variable payload. The payload always
-	contains a pack SHA-1. If no index data is sent the receiving
+	contains a pack SHA1. If no index data is sent the receiving
 	peer should interpret it as a request for the pack index,
 	otherwise the data of the pack index object follows. The
 	recipient MUST only send index object messages to a sender that
@@ -1474,9 +1474,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
----------------------------
-| Pack SHA-1 | Index Data |
----------------------------</artwork>
+----------------------------
+| Pack SHA1 | Index Object |
+----------------------------</artwork>
 </figure>
 </t>
 </section>
@@ -1487,7 +1487,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 8 and a payload of length 28. The payload is
-	first an object SHA-1 and two integers indicating a block within
+	an object SHA1 followed by two integers indicating a block within
 	an object that the sender is interested in downloading from the
 	recipient. The recipient MUST only send object messages to a
 	sender that has already requested it, and only in accordance to
@@ -1496,9 +1496,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
-----------------------------------------------
-| Object SHA-1 | Block Offset | Block Length |
-----------------------------------------------</artwork>
+---------------------------------------------
+| Object SHA1 | Block Offset | Block Length |
+---------------------------------------------</artwork>
 </figure>
 
 </t>
@@ -1507,7 +1507,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 9 and a variable length payload. The payload
-	holds an object SHA-1 and an integer indicating from which
+	holds an object SHA1 and an integer indicating from which
 	object and with what offset the block data in the 3rd member is
 	derived. Note, the data length is implicit and can be calculated
 	from the total message length. The payload has the following
@@ -1515,9 +1515,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
---------------------------------------------
-| Object SHA-1 | Block Offset | Block Data |
---------------------------------------------</artwork>
+-------------------------------------------
+| Object SHA1 | Block Offset | Block Data |
+-------------------------------------------</artwork>
 </figure>
 </t>
 </section>
@@ -1525,7 +1525,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 10 and a payload of length 28. The payload
-	is one object SHA-1 nad two integer values indicating a block
+	is one object SHA1 and two integer values indicating a block
 	within an object that the sender has requested, but is no
 	longer interested in. The recipient MUST erase the request
 	information upon receiving this messages. The payload has the
@@ -1533,9 +1533,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
-----------------------------------------------
-| Object SHA-1 | Block Offset | Block Length |
-----------------------------------------------</artwork>
+---------------------------------------------
+| Object SHA1 | Block Offset | Block Length |
+---------------------------------------------</artwork>
 </figure>
 
 </t>
