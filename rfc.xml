@@ -53,7 +53,7 @@
    this will occasionally involve clients cloning a complete
    repository. This places much strain on sites hosting many git
    repositories in terms of request-processing and sheer bandwidth.  It
-   is the goal of GTP to facilitate peer-to-peer distribution.
+   is the goal of GTP to facilitate such peer-to-peer distribution.
 
 </t>
 <t>
@@ -63,7 +63,10 @@
    fact by having clients upload bits of the repository data to each
    other. In comparison to the original client-server distribution, this
    adds huge scalability and cost-management advantages.
-<!-- also, mirrors are automatically used... -->
+
+<cref>also, mirrors are automatically used as soon as they are added,
+      instead of requiring mirror administrators to configure and
+      advertise them</cref>
   
 </t>
 </abstract>
@@ -97,9 +100,10 @@
 </t>
 <t>
 
-<!-- IMO, the major benefit may actually come from the ability to set
-     up mirrors and have them replicate automatically... so I've
-     changed terms like "not mirrors" to "not only mirrors" -->
+<cref>IMO, the major benefit may actually come from the ability to set
+     up mirrors and have them replicate automatically... hence the use
+     of "not only mirrors" where "not mirrors" appears in equivalent
+     sections of the BitTorrent specification</cref>
 
    The approach in the GitTorrent Protocol (GTP) is to spread the load not only across
    mirror servers, but across the clients themselves, by having them upload pieces of
@@ -115,8 +119,8 @@
 <section title="Extensions">
 <t>
 
-<!-- this should be reworded to express the true heritage of the
-     protocol, not just cut and pasted from BitTorrent -->
+<cref>this should be reworded to express the true heritage of the
+     protocol, not just cut and pasted from BitTorrent</cref>
  
    The GTP is designed to be extensible to meet the future needs of
    individuals and community forums. It also allows certain optional
@@ -180,10 +184,9 @@
 
 </t>
 <t hangText="Torrent:">
-
-<!-- not just the ones being downloaded... -->
+ 
 	A torrent is the term for a group of branches that are being
-	shared, and all of their associated objects.
+	shared or downloaded, and all of their associated objects.
 
 </t>
 <t hangText="Swarm:">
@@ -221,12 +224,13 @@
 </t>
 <t hangText="Repo hash:">
 
-<!-- could even refer to the SHA1 spec here ... -->
        A SHA1 hash that uniquely identifies the torrent. It is calculated from
        digesting the content of the metainfo file.
 
+<cref>could even refer to the SHA1 spec here</cref>
+
 </t>
-<t hangText="Object ID:">
+<t hangText="Git Object ID:">
 
        A SHA1 hash that uniquely identifies an object in a git
        repository.  This is similar to a SHA1 digest of the object,
@@ -340,8 +344,10 @@
 <t>
 
    Strings are encoded by prefixing the string content with the length
-   of the string <!-- in ... bytes? --> followed by a colon. E.g. the string "announce" is
-   encoded as "8:announce". <!-- and the encoding is... ? -->
+   of the string followed by a colon. E.g. the string "announce" is
+   encoded as "8:announce".
+
+<cref>Consideration should be made of content encoding.</cref>
 
 </t>
 </section>
@@ -406,14 +412,16 @@
 <t>
 
 	New tags and branch updates are announced using reference lists,
-	that contain information about what git commit SHA-1 each branch
-	is at and the name and SHA-1 of available tags. The reference
+	that contain information about what git object ID each branch
+	head refers to and the name and git object ID of available tags. The reference
 	list enables a peer to know which revision history to trust and
 	consequently which objects to request. Since references may be
 	distributed using both THP and PWP, trust is ensured by
 	requiring that all reference information distributed in the
-	swarm is signed so that the peer may verify the signature using
-	a public key available in the metainfo file.
+	swarm is signed.  Peers SHOULD verify the signature using
+	the public key listed in the metainfo file.  Peers SHOULD also
+	only process updated references that the public key used to
+	sign the reference are permitted to update.
 
 </t>
 <t>
