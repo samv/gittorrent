@@ -626,8 +626,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'repo':">
 
-	This is a list containing a description of each branch offered
-	in the torrent.
+	This is a dictionary containing information on the repository
+	offered in the torrent.
 
 <list style="hanging">
 <t hangText="'branches':">
