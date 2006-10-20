@@ -502,7 +502,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Objects">
 <t>
 
-    An object is either a single git object or a group of git objects
+    An object in GTP/1.0 is either a single git object or a group of git objects
     compressed into a pack object. All objects are uniquely identified
     by a SHA1, derived from the object content. Pack objects are
     special in that they are accompanied by an index object listing the
@@ -510,14 +510,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
     objects they have by first requesting the list of pack objects a
     neighboring peer makes available and afterwards requesting the index
     files for each pack. Although git objects may be distributed one by
-    one, it is recommended that peers primarily use packs for
+    one, a peer SHOULD primarily use pack objects for
     downloading to improve overall bandwidth utilization.
 
 </t>
 <t>
 
     The size of the individual pack objects is implementation dependent.
-    As a guideline a peer should not provide packs with a size that is
+    As a guideline, a peer SHOULD NOT provide packs with a size that is
     greater than the resulting pack index object can be sent in its
     entirety over the wire.  Also, git objects may be packed in a
     variety of different packs resulting in the peer having many
@@ -747,7 +747,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	The port number that the peer is listening to for incoming
 	connections from other peers. GTP/1.0 does not specify a
-	standard port number, nor a port range to be used. This key is required.
+	standard port number, nor a port range to be used. This key is REQUIRED.
 
 </t>
 <t hangText="'uploaded':">
@@ -768,6 +768,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This is a base ten integer value. The value must be 0 if the peer does
 	not have the complete torrent and 1 if it has the complete torrent.
+	Since a peer cannot guarantee that it is a seeder, this value should
+	only be interpreted as an approximation that can help to estimate how
+	many seeders are in the swarm.
 
 </t>
 <t hangText="'ip':">
@@ -780,7 +783,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'peers':">
 
-	This is an OPTIONAL value. If present, it should indicate the
+	This is an OPTIONAL value. If present, it should hold a base ten integer value indicating the
 	number of peers that the local peer wants to receive from the
 	tracker. If not present, the tracker uses an implementation
 	defined value.
@@ -788,7 +791,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'references':">
 
-	This is an OPTIONAL value. If present, it should indicate the
+	This is an OPTIONAL value. If present, it should hold a base ten integer value indicating the
 	number of references that the local peer wants to receive from the
 	tracker. If not present, the tracker uses an implementation
 	defined value.
@@ -1037,8 +1040,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Peer Wire Guidelines" anchor="peer-wire-guidelines">
 <t>
 
-   PWP does not specify a standard algorithm for selecting elements from
-   a clients neighboring peers with whom to share pieces, although the
+   PWP does not specify a standard algorithm for selecting the
+   neighboring peers with whom to share objects, although the
    following guidelines are expected to be observed by any such
    algorithm:
 
@@ -1153,7 +1156,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="Repo Hash:">
 
-	The next 20 bytes in the string are to be interpreted as a
+	The next 20 bytes in the handshake specify the
 	20-byte SHA1 of the repo key in the metainfo file.
 	Presumably, since both the local and the remote peer contacted
 	the tracker as a result of reading in the same ".gittorrent" file,
@@ -1162,12 +1165,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	connection MUST be dropped. This situation can arise if the
 	local peer decides to no longer serve the file in question for
 	some reason. The repo hash may be used by the client to
-	serve multiple torrents on the same port.
+	distinguish between multiple torrents served on the same port.
 
 </t>
 <t>
 
-	At this stage, if the connection has not been dropped, then the
+	At this stage, if the connection has not been dropped, the
 	local peer MUST send its own handshake back, which includes the
 	last step:
 
@@ -1259,8 +1262,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
   An interested peer indicates to the remote peer that it must expect to
-  receive data-oriented messages as soon as it unchokes the interested peer. It
-  must be noted, that a peer must not assume a remote peer is interested solely
+  receive data-oriented messages as soon as it unchokes the interested peer. A
+  peer MUST not assume a remote peer is interested solely
   because it has pieces that the remote peer is lacking. There may be valid
   reasons why a peer is not interested in another peer other than data-based
   ones.
@@ -1387,8 +1390,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 4 and a variable payload length. The payload
-	is a list of peers each with their self-designated peer ID, port
-	number, and the IP address of the peer.  This may be given as a
+	is a list of peers each with the self-designated peer ID, the port
+	number, and the IP address of the peer.  The IP address may be given as a
 	dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.  A
 	peer can send this message with no payload to request peer
 	lists from the remote peer.  See <xref target="peers" />
@@ -1460,8 +1463,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
 	
-	A peer receiving this message SHOULD send an index
-	message to the sender to keep it informed of any new objects
+	A peer receiving this message SHOULD send a request for the index object
+	to the sender to keep it informed of any new objects
 	the remote peer has downloaded.
 
 <figure>
@@ -1483,7 +1486,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	has already requested the index object. A peer receiving this
 	message MUST send an interested message to the sender if indeed
 	it lacks any of the objects that are announced.  Further, it MAY
-	also send a request for that pack or object.  The payload has
+	also send a request for that pack or object if it not choked by the remote peer.  The payload has
 	the following structure:
 
 <figure>
@@ -1560,7 +1563,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    Towards the end of a download session, it may speed up the download
-   to send request messages for the remaining objects to all the
+   to send request messages for the remaining objects to more than one
    neighboring peers. A client must issue cancel messages to all pending
    requests sent to neighboring peers as soon as an object is downloaded
    successfully. This is referred to as the end game.
