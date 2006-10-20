@@ -357,7 +357,7 @@
 <t>
 
    Strings are encoded by prefixing the string content with the length
-   of the string followed by a colon. E.g. the string "announce" is
+   of the string in bytes, followed by a colon. E.g. the string "announce" is
    encoded as "8:announce".
 
 <cref>Consideration should be made of content encoding.</cref>
@@ -488,7 +488,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Objects and Blocks">
 <t>
 
-   This section describes how a torrent is organized in objects,
+   This section describes how a torrent is organized into objects
    and blocks. The torrent is divided into one or more objects. Each
    object is named using a SHA1 hash which allows the peer to verify
    the contents of a single object. Using the repository references as
@@ -582,7 +582,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    In order for a client to recognize the metainfo file it SHOULD have
-   the extension .gittorrent and the associated the media type
+   the extension ".gittorrent" and the associated the MIME type
    "application/x-gitttorrent". How the client retrieves the metainfo
    file is beyond the scope of this document, however, the most
    user-friendly approach is for a client to find the file on a web
@@ -1373,7 +1373,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This message has ID 2 and no payload. A peer sends this message
 	to a remote peer to inform the remote peer of its desire to
-	request data.
+	request objects.
 
 
 </t>
