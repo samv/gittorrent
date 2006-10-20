@@ -519,14 +519,23 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
     The size of the individual pack objects is implementation dependent.
     As a guideline, a peer SHOULD NOT provide packs with a size that is
     greater than the resulting pack index object can be sent in its
-    entirety over the wire.  Also, git objects may be packed in a
-    variety of different packs resulting in the peer having many
-    different possible overlapping packs depending on how the download
-    history of the peer. This reduces changes that a pack object will be
-    available from multiple peers. Keeping the size of the pack objects
-    down ensures that a peer will have a greater change at being able to
-    both request and complete the download of the pack from one
+    entirety over the wire. Keeping the size of the pack objects
+    down helps to ensure that a peer will have a greater chance of
+    completing the download of the pack from a single
     neighboring peer.
+    
+</t>
+<t>
+
+	Git objects may be packed in a variety of different pack objects
+	based on different heuristics. Since GTP/1.0 does not impose
+	that a specific heuristic is used, this reduces chances that a
+	pack object will be available from multiple peers. Consequently,
+	a peer can have many different and possibly overlapping pack
+	objects depending on the download history of the peer.  As a
+	guideline, it is RECOMMENDED that a peer does not immediately
+	repack objects, in order to increase the availability of the
+	same pack objects from multiple peers.
 
 </t>
 </section>
