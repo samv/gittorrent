@@ -237,6 +237,13 @@
        but it is seeded with the object type and length.
 
 </t>
+<t hangText="branch">
+
+       A branch refers to a named pointer to a git commit object which
+       is the most recent commit in the version of the project
+       referred to.  They are also called "Head References".
+
+</t>
 </list>
 </section>
 
@@ -598,8 +605,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'pubkey':">
 
-	This is a string value. It must contain the public key that is
-	used by GTP/1.0 to verify each update to a branch head.
+	This is a string value. It must contain the PGP key ID that is
+	used by GTP/1.0 to authorise updates to all branch heads.
 
 </t>
 <t hangText="'repo':">
@@ -622,10 +629,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'pubkey':">
 
-	This is an OPTIONAL string value. It must contain the public key
-	that is used by GTP/1.0 to verify each update to a branch head.
-	If no key is supplied the global "pubkey" value will be used for
-	verification branch updates.
+	This is an OPTIONAL string value. It must contain the key ID
+	that is used by GTP/1.0 to authorise each updates to a branch
+	head.  The global "pubkey" value will always be be authorised
+	to make branch updates.
 
 </t>
 <t hangText="'alternatives':">
@@ -654,6 +661,32 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	pointing to a tracker.
 
 </t>
+<t hangText="'keys':">
+
+	This key points to a dictionary that contains information about
+	the PGP keys used in the rest of the file.
+
+<list style="hanging">
+<t hangText="'ID':">
+
+	This is a valid shortening of the ID of the key as a string.
+
+</t>
+<t hangText="'pubkey':">
+
+	This is a string value. It MUST contain the public key that is
+	used by GTP/1.0 to verify each update to a branch head.  It is
+	recommended to use PGP keys for this purpose, but X.509
+	certificates are reasonable substitutes.  This SHOULD be just
+	the public key with no extra signatures, except the
+	self-signature.  It is up to the client to detect the type of
+	and interpret this key.  If a client does not understand this
+	key, it SHOULD NOT process any updates from branches that list
+	this key, or if it is the top level key, it SHOULD refuse to
+	join the swarm.
+
+</t>
+</list>
 </list>
 
 </section>
