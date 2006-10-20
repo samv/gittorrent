@@ -53,8 +53,7 @@
    this will occasionally involve clients cloning a complete
    repository. This places much strain on sites hosting many git
    repositories in terms of request-processing and sheer bandwidth.  It
-   is the goal of GTP to facilitate mirroring of such hosting services by reducing
-   resource demands.
+   is the goal of GTP to facilitate peer-to-peer distribution.
 
 </t>
 <t>
