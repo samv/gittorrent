@@ -1320,7 +1320,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    If an incoming message in any way violates this structure then the
    connection SHOULD be dropped.  In particular the receiver SHOULD make
-   sure the message ID constitutes a valid message, and the payload
+   sure the payload
    matches the the expected payload, as given below. 
 
 </t>
