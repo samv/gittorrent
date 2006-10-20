@@ -244,6 +244,12 @@
        referred to.  They are also called "Head References".
 
 </t>
+<t hangText="Reference object:">
+
+	A signed git tag object used for distributing the list of
+	repository references, i.e. branches and tags.
+
+</t>
 </list>
 </section>
 
@@ -433,11 +439,11 @@
 </t>
 <t>
 
-	Repository references are distributed in a signed tag object.
-	Each new repository reference tag should refer to its successor
+	Repository references are distributed in a signed git tag object.
+	It is RECOMMENDED that each new reference tag object refer to its successor
 	to indicate the relation between a newer and older reference
 	object. However, when a peer does not have all reference objects
-	it should should use the creation date indicated in the tag
+	it MAY use the creation date indicated in the tag
 	object to infer a relation between two reference objects.  How
 	to verify the signed git tag is beyond the scope of this
 	document.
@@ -446,8 +452,8 @@
 <t>
 
 	The format of data embedded in the tag object is the same as the
-	format of the .git/info/refs file. It is line-oriented, where
-	each line contains a SHA-1 and reference name separated by a
+	format of the "info/refs" file in the git repository. It is line-oriented, where
+	each line contains a SHA1 and a reference name separated by a
 	tab. Details on how peers should interpret the reference names
 	are beyond the scope of this document. Following is an example:
 
@@ -470,7 +476,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	branches are listed in it. The entity in charge of signing the
 	references objects must make decisions regarding how to best
 	distribute the repository references. For repositories with many
-	branches or tags it may be necessary to split up the list of
+	branches or tags, it is RECOMMENDED to split up the list of
 	references so as not to require big objects to be exchanged over
 	the wire. The same applies for repositories with frequent
 	updates, in that partial and smaller reference lists can help to
@@ -561,7 +567,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    The metainfo file provides the client with information on the tracker
    location as well as the torrent to be downloaded. Besides listing
    which branches will result from downloading the torrent, it also provides
-   the client with a mean to verify branches.
+   the client with a public key to verify reference objects.
 
 </t>
 <t>
@@ -675,7 +681,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'pubkey':">
 
 	This is a string value. It MUST contain the public key that is
-	used by GTP/1.0 to verify each update to a branch head.  It is
+	used by GTP/1.0 to verify reference objects.  It is
 	recommended to use PGP keys for this purpose, but X.509
 	certificates are reasonable substitutes.  This SHOULD be just
 	the public key with no extra signatures, except the
@@ -687,6 +693,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </list>
+<t hangText="'references':">
+
+	This key points to a string that contains a reference object.
+	The value can be sent to neighboring peers over the wire using
+	the References message.  See <xref target="references" /> for
+	instructions on how to interpret the string.
+
+</t>
 </list>
 
 </section>
@@ -872,8 +886,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'references':">
 
-	This is a string value containing information about the
-	references in the repository. The value can be sent to
+	This is a list of string values containing information about the
+	references in the repository. Each value contains a reference object that can be sent to
 	neighboring peers over the wire using the References message.
 	See <xref target="references" /> for instructions on how
 	to interpret the string.
@@ -1395,8 +1409,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	references from the remote peer, a peer can send this message
 	with no payload. To announce to the other peer that it has a
 	new reference object available it can send this message with a
-	reference SHA1 and an empty reference object. A peer should never send
-	its current reference object unless it has requested using
+	reference SHA1 and an empty reference object. A peer MUST NOT send
+	its current reference object unless it has been requested by the remote peer using
 	this method.  This reduces the impact of new reference object
 	being flooded in the network.
 
@@ -1710,9 +1724,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Issues with File and Directory Names">
 <t>
 
-   The metainfo file provides a way to suggest a name of the downloaded
-   branches for torrents. GTP clients SHOULD verify that the suggested
-   file names in the metainfo file do not compromise services on the
+   The reference object provides a way to suggest a name of the downloaded
+   branches for torrents. If the GTP client stores references in individual files it SHOULD verify that the suggested
+   reference names in the reference object do not compromise services on the
    local system when translated to a path in the repository structure.
 
 </t>
@@ -1755,19 +1769,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    By default, all content served to the client from other peers should
    be considered tainted and the client SHOULD validate the integrity of
-   the data before accepting it. The metainfo file contains information
-   for checking both individual objects using SHA1, and optionally individual files
-   using MD5. SHA1, being the strongest of the two, is preferred.
-   Furthermore, sole reliance on whole-file checking can potentially
-   render otherwise valid objects invalid, and should only be considered
-   for small files, to limit the amount of data being discarded.
+   the data before accepting it. The metainfo file contains a public key
+   for checking the integrity of reference objects. Using the branch and
+   tag references the client is able to verify the revision lists they point to.
+   Finally, individual objects can be checked using the SHA1 name of the object.
 
 </t>
 <t>
 
    Trusting the validity of the resulting repository ends up being a
-   matter of trusting the content of the metainfo file and branch
-   updates from the tracker. Ensuring the validity of the metainfo file
+   matter of trusting the content of the metainfo file and reference
+   objects distributed by the tracker and over the wire. Ensuring the validity of the metainfo file
    is beyond the scope of this document.
 
 </t>
