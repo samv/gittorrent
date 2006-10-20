@@ -1583,11 +1583,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    GTP/1.0 does not force a particular order for selecting which objects
-   to download. However, experience shows that downloading in
-   rarest-first order seems to lessen the wait time for objects. To find
-   the rarest objects a client must calculate for each commit object the
-   number of times this index is true in the commit bitfield vectors of
-   all the neighboring peers. The object with the lowest sum is then
+   to download. However, downloading in
+   rarest-first order can lessen the wait time for objects. To find
+   the rarest objects a client must calculate for each git commit object the
+   number of times this commit is available from all its
+   neighboring peers. The objects pointed to by the git commit object with the lowest sum is then
    selected for requesting.
 
 </t>
