@@ -411,16 +411,16 @@
 	requests for downloads and receiving reference updates, and
 	contacting the tracker at the minimum negotiated frequency.
 	If it receives a suitably authorized reference update via PWP
-	or a periodic update returns a new set of repository
-	references, it
-	MUST no longer consider itself a Seeder, and start fetching
-	the new content.  This is one key difference to the BitTorrent
-	protocol, in which individual torrents do not update.  Seeders
-	MAY periodically check with the tracker whether new updates
-	have been received, but this is not necessary, as once the
-	first peer gets the reference, that peer will start attempting
-	to transfer the new reference list and objects to the peers
-	that used to be considered Seeders.
+	or a periodic check returns a new set of repository
+	references, it MUST no longer consider itself a Seeder, and
+	start fetching the new content.  This is one key difference to
+	the BitTorrent protocol, in which individual torrents do not
+	update.  Seeders MAY check with the tracker more frequently to
+	determine whether new updates have been received, but this is
+	not necessary - as once the first peer gets the reference,
+	that peer will start attempting to transfer the new reference
+	list and objects to its peers that used to be considered
+	Seeders.
 
 </t>
 </section>
