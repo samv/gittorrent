@@ -91,7 +91,7 @@
 </t>
 <t>
 
-   The existing distribution protocols provide secure and reliable
+   The existing distribution protocol provides secure and reliable
    transmission of large git repositories over the Internet. However,
    their highly centralized client-server approach also means that it is
    inadequate for mass publication of files, since a single point may
@@ -808,7 +808,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	obtain an updated list of peers and update the tracker of its
 	status. The value of this key indicated the amount of time
 	that a peer should wait between consecutive regular
-	requests. This key is REQUIRED.
+	requests, in seconds. This key is REQUIRED.
     
 </t>
 <t hangText="'complete':">
@@ -928,8 +928,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    "repo_hash" parameter in the query part similar to THP requests. This
    can be used to restrict the response to a particular torrent. If
    the parameter is left out the response will contain information for
-   all the torrents a tracker is serving. Clients are strongly advised
-   to use this facility to lessen the load on the tracker.
+   all the torrents a tracker is serving. Clients SHOULD
+   use this facility to lessen the load on the tracker.
 
 </t>
 </section>
@@ -952,21 +952,21 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <list style="hanging">
 <t hangText="'complete':">
 
-	This is an integer indicating the number of seeder. This key is
+	This is an integer indicating the number of seeders. This key is
 	REQUIRED.
 
 </t>
 <t hangText="'downloaded':">
 
 	This is an integer indicating the total number of times a peer
-	has reported a completed download to the tracker.This key is
+	has reported a completed download to the tracker.  This key is
 	REQUIRED.
 
 </t>
 <t hangText="'incomplete':">
 
-	This is an integer indicating the number of leechers. This key
-	is REQUIRED.
+	This is an integer indicating the number of peers which are
+	not seeders. This key is REQUIRED.
 
 </t>
 <t hangText="'name':">
@@ -981,8 +981,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    If an "repo_hash" parameter was sent in the scrape request the
-   'files' dictionary will contain only a single dictionary. Else a
-   dictionary for each torrent the tracker is serving is returned.
+   'files' dictionary will contain only a single entry (that contains
+   a dictionary).  Otherwise, it will be populated with a dictionary
+   for each torrent the tracker is serving.
 
 </t>
 </section>
@@ -1005,7 +1006,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    PWP does not specify a standard algorithm for selecting the
-   neighboring peers with whom to share objects, although the
+   neighboring peers with which to share objects, although the
    following guidelines are expected to be observed by any such
    algorithm:
 
@@ -1021,7 +1022,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
   
-	  The algorithm should not use a strict tit-for-tat schema when
+	  The algorithm should not use a strict tit-for-tat scheme when
 	  dealing with remote peers that have just joined the swarm
 	  and thus have no objects to offer.
 
@@ -1030,12 +1031,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	  The algorithm should make good use of both download and upload
 	  bandwidth by putting a cap on the number of simultaneous
-	  connection that actively send or receive data. By reducing the
+	  connections that actively send or receive data. By reducing the
 	  number of active connections, TCP congestion can be avoided.
 
 </t>
 <t>
-         The algorithm should pipeline data requests in order so saturate
+         The algorithm should pipeline data requests in order to saturate
          active connections.
 </t>
 <t>
@@ -1117,19 +1118,22 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	according to what extensions they support else it should be
 	read without interpretation.
 
+<cref>SV - How are extension designers supposed to know what to put in
+      here?</cref>
+
 </t>
 <t hangText="Repo Hash:">
 
 	The next 20 bytes in the handshake specify the
-	20-byte SHA1 of the repo key in the metainfo file.
+	20-byte SHA1 of the metainfo file.
 	Presumably, since both the local and the remote peer contacted
 	the tracker as a result of reading in the same ".gittorrent" file,
 	the local peer will recognize the repo hash value and will be
 	able to serve the remote peer. If this is not the case, then the
 	connection MUST be dropped. This situation can arise if the
 	local peer decides to no longer serve the file in question for
-	some reason. The repo hash may be used by the client to
-	distinguish between multiple torrents served on the same port.
+	some reason. The repo hash may be used to enable the peer to
+	serve multiple torrents on the same port.
 
 </t>
 <t>
@@ -1153,6 +1157,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    In GTP/1.0 the handshake has a total of 68 bytes.
+
+<cref>SV - what is the handshake response?  Another similar message?</cref>
 
 </t>
 </section>
@@ -1364,9 +1370,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
-----------------------------------------------------------
-| Peer SHA1 | Peer Port | Peer IP Length | Peer IP | ... |
-----------------------------------------------------------</artwork>
+--------------------------------------------------------
+| Peer ID | Peer Port | Peer IP Length | Peer IP | ... |
+--------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
