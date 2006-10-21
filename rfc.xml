@@ -158,8 +158,9 @@
 
    It is assumed that developers are familiar with the git version
    control system, more specifically the layout of the repository and
-   the design of the object store. This includes the use of pack files
-   and how to validate signed tag objects.
+   the design of the object store. This includes the concepts of the
+   commit and general object tree, "shallow" pack files and how to
+   validate signed tag objects.
 
 </t>
 </section>
@@ -489,26 +490,35 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Objects and Blocks">
+<section title="Objects, commit-reels and blocks">
 <t>
 
-   This section describes how a torrent is organized in objects, and
-   blocks. The torrent is considered to be the entire collection of
-   objects referred to by its current list of references, with no
-   regard to the structure of its own pack files.  Each object is
-   named using a SHA1 hash which allows the peer to verify the
-   contents of a single object. Using the repository references as the
-   starting point, and walking all downloaded objects according to the
-   git object hierarchy, the peer is able to verify the complete
-   object store.  When distributing data over PWP, peers request all
-   the new objects between two reference lists as a pack file.  The
-   new objects are sorted in a defined way and then logically divided
-   into roughly even blocks by uncompressed size, dividing only on
-   object boundaries.  The blocks MAY be delta compressed against
-   preceding objects to be sent, and the results MUST also be gzip
-   compressed, conformant to the requirements of the git pack file
-   format.
+   This section describes how a torrent is organized in objects,
+   commit-reels and blocks.
 
+</t>
+<t>
+   The torrent is considered to be the entire tree of "objects"
+   referred to by its current list of references.  
+   Each object is named using a SHA1 hash which allows the peer to
+   verify the contents of a single object, as well as refer to any
+   object in the repository using a single namespace.  Using the
+   repository references as the starting point, and walking all
+   downloaded objects according to the git object hierarchy, the peer
+   is able to verify the complete object store.
+</t>
+<t>
+   When distributing data over PWP, peers request all the new objects
+   between two reference lists as a "commit reel".  The new objects
+   are sorted in a defined way and then logically divided into roughly
+   even "blocks" by uncompressed size, dividing only on object
+   boundaries.  The blocks are a logical concept only; responses are
+   "shallow" git pack files, which SHOULD be delta compressed against
+   objects preceding them in the commit reel or any other object
+   reachable from the starting reference list.  The results MUST also
+   be gzip compressed, conformant to the requirements of the git pack
+   file format.  Specifically, these commit-reels are not merely the
+   structure of the pack files in the underlying git repository.
 </t>
 
 <section title="Objects">
@@ -516,10 +526,45 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
     An object is a single git object.  All objects are uniquely
     identified by a SHA1, derived from the object content, type and
-    length. Peers can exchange information about what objects they
+    length.  Peers can exchange information about what objects they
     have by requesting the list of references a neighboring peer makes
-    available and checking for unknown object IDs in the list.
+    available, and checking for unknown object IDs in the list.
 
+<cref>SV - should move object ID into the glossary</cref>
+
+</t>
+</section>
+
+<section title="Commit-Reels">
+<t>
+
+    A commit reel is defined as a topologically sorted serialization
+    of objects between two sets of references.  It contains all of the
+    new objects that you could get if you already had all the objects
+    required for the first set of references, but not yet the second
+    set.  The objects are sorted in such a way that all of the objects
+    that a given object refers to are already available before the
+    object itself.  This is called "topological order".  However, by
+    itself this leads to ambiguity, so some extra rules are drawn to
+    make the positions of objects within the commit-reel
+    deterministic.
+
+</t>
+<figure>
+<artwork>
+      Level   Sort Order
+       1st    Topological sort
+       2nd    "commit" time
+       3rd    Object SHA1 </artwork>
+
+<cref>Sorting by "commit" time might seem arbitrary, but hopefully
+      should lead to useful ordering of objects most of the time.
+      </cref>
+
+</figure>
+
+</t>
+<t>
 </t>
 </section>
 
@@ -527,46 +572,47 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
     The size of a block is an implementation defined value that is not
-    dependent on the number of objects being requested.  Once a block
-    size is determined, the number of blocks required for an update
+    dependent on the size of the commit-reel being requested.  Once a block
+    size is determined, the number of blocks in a commit-reel
     can be calculated using the formula:
 
 </t>
 <figure>
 <artwork>
-        number_of_blocks = (total_object_size / fixed_block_size)
-                         + !!(total_object_size % fixed_block_size)</artwork>
+        number_of_blocks = (total_reel_size / fixed_block_size)
+                         + !!(total_reel_size % fixed_block_size)</artwork>
 </figure>
 <t>
 
     where "%" denotes the modulus operator, and "!" the logical
     negation operator.
     The logical negation operator is used to ensure that the last factor only
-    adds a value of 0 or 1 to the sum. Given the start offset of
-    the block its index within a piece can be calculated using the
+    adds a value of 0 or 1 to the sum. Given the block number of
+    the block, its offset within a commit-reel can be calculated using the
     formula:
 
 </t>
 <figure>
 <artwork>
-        block_index = block_offset % fixed_block_size</artwork>
+        reel_offset = block_number % fixed_block_size</artwork>
 </figure>
 <t>
 
-    To keep the protocol simple, only complete objects are even packed
-    into single pack files.  The objects to be sent are those that
-    start within the boundary of the start of the block, and the end
-    of the block.  This implies that if single objects span several
-    block boundaries, that some blocks will contain no objects.
+    To keep the protocol simple, only complete objects are send in
+    messages, into "shallow" pack files.  In optimal operation, these
+    are the only parts that will be transferred.  Objects are
+    considered to be "in" a block if they start within the block. This
+    implies that if single objects span several block boundaries, that
+    some blocks will contain no objects.  However, this irregularity
+    of blocks is balanced by the fact that it is expensive to
+    determine the real size of the pack without making it; and this
+    cannot be performed deterministically over the entire swarm
+    without sacrificing much compression ratio and hence the total
+    download requirements of peers.
 
 </t>
 <t>
 
-    However, this irregularity of blocks is balanced by the fact that
-    it is impossible to determine the real size of the pack without
-    making it; and this cannot be performed deterministically over the
-    entire swarm without sacrificing much compression ratio and hence
-    the total download requirements of peers.
 
 </t>
 </section>
@@ -1200,14 +1246,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	type MUST be sent whenever a change occurs in a peer's state,
 	regardless of the state of other peers. The following messages
 	fall into this category: Interested, Uninterested, Choked,
-	Unchoked, References, Packs, Index, and Peers.
+	Unchoked, References, Reels, Blocks, and Peers.
 
 </t>
 <t hangText="Data-oriented messages:">
 
 	These messages handle the requesting and sending of data
 	portions. The following messages fall into this category:
-	Request, Cancel and Piece.
+	Index, Request, and Cancel.
 
 </t>
 </list>
@@ -1423,40 +1469,39 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <cref>OK.  Here's one of the first changes: we send a _list_ of
       references that we are currently dealing with.  The idea being
-      that each one defines the boundary of a pack; either the
+      that each one defines the boundary of a commit-reel; either the
       beginning, or the end.
 </cref>
 </section>
-<section title="Packs">
+<section title="Reels">
 <t>
 
 	This message has ID 6 and a variable payload length. The
-	payload is a list of pack files that the sender can offer
-	parts of, or is in the process of trying to get.  Each pack
-	file is listed with a pair of SHA1 objects uniquely
-	identifying the reference objects that identify the start and
-	end of it, and an 8-byte big-endian number telling the total
-	(uncompressed) size of all of the objects in the pack file.
-	In all, 48 bytes per virtual pack object.  A peer can send
-	this message with no payload to request the packs from the
-	remote peer.  If a pack spans to the beginning of history,
-	then the SHA1 value to use for the "Start" is the SHA1 of the
-	empty string ("da39a3...").  A peer MUST be able to return the
-	corresponding references objects for all of the references'
-	SHA1s returned by this message when asked with the
-	"References" message.
+	payload is a list of Reels that the sender can offer parts of,
+	or is in the process of trying to get.  Each commit-reel is
+	listed with a pair of SHA1 objects uniquely identifying the
+	reference objects that identify the start and end of it, and
+	an 8-byte big-endian number telling the total (uncompressed)
+	size of all of the objects in the reel.  In all, 48 bytes per
+	commit-reel.  A peer can send this message with no payload to
+	request the list of reels from the remote peer.  If a reel
+	spans to the beginning of history, then the SHA1 value to use
+	for the "Start" is the SHA1 of the empty string ("da39a3...").
+	A peer MUST be able to return the corresponding references
+	objects for all of the references' SHA1s returned by this
+	message when asked with the "References" message.
 
 </t>
 <t>
 	
-	A peer receiving this message SHOULD send a request for the index object
-	to the sender to keep it informed of any new objects
-	the remote peer has downloaded.
+	A peer receiving this message SHOULD send a request for the
+	blocks list to the sender to keep it informed of any new
+	objects the remote peer has downloaded.
 
 <figure>
 <artwork>
 ------------------------------------
-| Pack SHA1 Pair | Pack size | ... |
+| Reel SHA1 Pair | Reel size | ... |
 ------------------------------------</artwork>
 </figure>
 </t>
@@ -1465,31 +1510,32 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 7 and a variable payload length. The
-	payload is a SHA1 pair identifying the virtual pack file of
-	which block download status are being queried or notified.  A
+	payload is a SHA1 pair identifying the commit-reel of which
+	block download status are being queried or notified.  A
 	message sent without a Bitmap is a query, and one sent with
 	one is a notification (or a response to a query).  The block
 	offset and size are 32-bit integers.  The block offset must be
 	multiplied by the block size to arrive at the virtual location
-	within the pack file.
+	within the commit-reel.
 
 </t>
 <t>
 	
-	A peer receiving this message SHOULD send an blocks message to
-	the sender to keep it informed of the new status.  The sender
-	should only set bits in the bitmap when it knows that it has
-	all the objects that start in this block.  The bitmap is
-	interpreted byte by byte, with the lowest bit in the first
-	byte of the bitmap corresponding to the first block in the
-	range reported on.  The Size field is a one-byte integer,
+	A peer receiving this message SHOULD send a blocks message to
+	the sender to keep it informed of the new status, if it has
+	changed since the last corresponding response to the sender.
+	The sender should only set bits in the bitmap when it knows
+	that it has all the objects that start in this block.  The
+	bitmap is interpreted byte by byte, with the lowest bit in the
+	first byte of the bitmap corresponding to the first block in
+	the range reported on.  The Size field is a one-byte integer,
 	specifying the number of valid bits in the last byte of the
 	Bitmap.
 
 <figure>
 <artwork>
 -----------------------------------------------------------------
-| Pack SHA-1 Pair | Block offset | Block length | Size | Bitmap |
+| Reel SHA-1 Pair | Block offset | Block length | Size | Bitmap |
 -----------------------------------------------------------------</artwork>
 </figure>
 </t>
@@ -1501,10 +1547,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
 	This message has ID 8 and a variable payload.  The payload
-	always contains a two references SHA1s, a block offset and
-	length.  Without the Index Data set, it is a request for an
-	index of objects in that block.  Otherwise, it takes the form
-	described later.
+	always contains a two references SHA1s identifying the
+	commit-reel, a block offset and length.  Without the Index
+	Data set, it is a request for an index of objects in that
+	block.  Otherwise, it is a response to a query, and the data
+	takes the form described later.
 
 </t>
 <t>
@@ -1512,19 +1559,20 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <figure>
 <artwork>
 --------------------------------------------------------------
-| Pack SHA-1 Pair | Block offset | Block Length | Index Data |
+| Reel SHA-1 Pair | Block offset | Block Length | Index Data |
 --------------------------------------------------------------</artwork>
 </figure>
 </t>
 <t>
 
-        The form of the index data is an offset into the block that
-        the first object starts, followed by a list of Object ID, a
-        byte for the type and a 4-byte integer for the length of the
-        object.  If a block is requested that a complete list of
-        objects is not available for, the Offset will be -1, and no
-        list will follow.  If no objects start within a block, the
-        Offset will be 0, and no list will follow.
+        The index data is an offset into the block that the first
+        object starts, followed by a list of index records.  Each
+        index record is an Object ID, a byte for the type and a 4-byte
+        integer for the length of the object.  If a block is requested
+        that a complete list of objects is not available for, the
+        Offset will be -1, and no list will follow.  If no objects
+        start within the block, the Offset will be 0, and no list will
+        follow.
 
 <cref>SV - I'm wondering whether it might be better to use BER
       integers than specify exactly how long each integer field is...
@@ -1544,9 +1592,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
         Note that it is only necessary to use this request when
         dealing with multiple peers which are downloading different
-        packs.  Also note that it is only guaranteed that peers have
+        reels.  Also note that it is only guaranteed that peers have
         the necessary information to answer this request if they have
-        all of the previous blocks to this one downloaded already.
+        all of the previous blocks in the reel to this one downloaded
+        already, or happen to have the index around.
 
 </t>
 </section>
@@ -1556,17 +1605,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This message has ID 9 and a variable length payload. The
 	payload is a count of objects, a list of object IDs that the
 	sender is interested in downloading from the recipient,
-	followed by a count and a list of Commit Object IDs that
-	defines the start of a range of objects that may be used as
-	delta bases for the transmitted pack.
+	followed by a count and a list of Commit IDs that defines the
+	start of a range of objects that may be used as delta bases
+	for the transmitted pack.
 
 </t>
 <t>
 
         The peer SHOULD send the Commit IDs for all of the complete
-        heads that it posesses.  The remote end MAY ignore this list
-        and produce a "deep" pack, which does not refer to any other
-        objects for deltas.
+        head references that it posesses.  The remote end MAY ignore
+        this list and produce a "deep" pack, which does not refer to
+        any other objects for deltas.
 
 <figure>
 <artwork>
@@ -1579,25 +1628,26 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
         This message should be considered an auxiliary method for
         getting small amounts of missing objects when all else fails,
-        or if it can be determined that this is a lighter-weight
-        alternative to the regular pack request mechanism.
+        or for situations where it is determined to be a light-weight
+        alternative to the regular reel request mechanism.
 
 </t>
 </section>
-<section title="Pack">
+<section title="Reel">
 <t>
 
-	This message has ID 9 and a variable length payload. The
+	This message has ID 10 and a variable length payload. The
 	payload holds a pair of reference SHA1 objects to which this
-	pack corresponds, the block offset and block length as per the
-	Index message.  The "Offset" returned is the offset into the
-	block that the first object starts.  All of these fields will
-	be all NULL if the pack is a response to the auxiliary
-	"Request" method above.  If the "Offset" and "Pack" fields are
-	not present, it is a request for the specified pack.  The pack
-	may use any object prior to it in pack, or any object
-	reachable from any of the base references, as bases for
-	deltas.
+	commit-reel corresponds, and the block offset and block length
+	as per the Index message.  The "Offset" returned is the offset
+	into the block that the first object starts.  If the "Block
+	Length" is zero, the pack is a response to the auxiliary
+	"Request" method above, and the "Reel SHA1 Pair" arbitrarily
+	set to values that may be used for the "Cancel" message.  If
+	the "Offset" and "Pack" fields are not present, it is a
+	request for the specified block.  The generated pack may use
+	as a delta base any object prior to it in the commit-reel, or
+	any object reachable from the commit-reel's start references.
 
 <figure>
 <artwork>
@@ -1610,18 +1660,19 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Cancel">
 <t>
 
-	This message has ID 10 and a payload of length 28. The payload
-	is one object SHA1 and two integer values indicating a block
-	within an object that the sender has requested, but is no
-	longer interested in. The recipient MUST erase the request
-	information upon receiving this messages. The payload has the
-	following structure:
+	This message has ID 11 and a payload of length 48. The payload
+	is a pair of reference SHA1s indicating the commit reel (or
+	token from the "Request" message, and offset and block length
+	values identifying a block that the sender has requested, but
+	is no longer interested in.  The recipient MUST refrain from,
+	or stop sending the block specified upon processing this
+	message. The payload has the following structure:
 
 <figure>
 <artwork>
----------------------------------------------
-| Object SHA1 | Block Offset | Block Length |
----------------------------------------------</artwork>
+------------------------------------------------
+| Reel SHA1 Pair | Block offset | Block Length |
+------------------------------------------------</artwork>
 </figure>
 
 </t>
