@@ -375,13 +375,29 @@
 </t>
 <t>
 
-	A peer SHOULD continously discover new peers while it is
+	While downloading, A peer SHOULD continously discover new peers while it is
 	connected to the swarm to find peers that provide better
 	download rates than its current neightboring peers.  Peer rating
 	and selection is discussed in <xref
 		target="peer-selection-strategy" />.  Periodically
 	connecting to new peers will also help ensure that torrents are
 	distributed throughout the swarm faster.
+
+</t>
+<t>
+
+	Once a peer has a complete copy of the current torrent, it
+	becomes a Seeder and MAY quiesesce, only passively processing
+	requests for downloads and receiving reference updates.  If it
+	receives a suitably authorized reference update via PWP, it
+	MUST no longer consider itself a Seeder, and start fetching
+	the new content.  This is one key difference to the BitTorrent
+	protocol, in which individual torrents do not update.  Seeders
+	MAY periodically check with the tracker whether new updates
+	have been received, but this is not necessary, as once the
+	first peer gets the reference, that peer will start attempting
+	to transfer the new reference list and objects to the peers
+	that used to be considered Seeders.
 
 </t>
 </section>
