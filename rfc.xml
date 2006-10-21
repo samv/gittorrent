@@ -53,7 +53,7 @@
    this will occasionally involve clients cloning a complete
    repository. This places much strain on sites hosting many git
    repositories in terms of request-processing and sheer bandwidth.  It
-   is the goal of GTP to facilitate such peer-to-peer distribution.
+   is the goal of GTP to facilitate such hosting sites in reducing resource demands by using P2P distribution.
 
 </t>
 <t>
@@ -63,10 +63,6 @@
    fact by having clients upload bits of the repository data to each
    other. In comparison to the original client-server distribution, this
    adds huge scalability and cost-management advantages.
-
-<cref>also, mirrors are automatically used as soon as they are added,
-      instead of requiring mirror administrators to configure and
-      advertise them</cref>
   
 </t>
 </abstract>
@@ -88,10 +84,10 @@
 
    The existing distribution protocols provide secure and reliable
    transmission of large git repositories over the Internet. However,
-   its highly centralized client-server approach also means that it is
-   inadequate for mass publication of files.  A single point will
-   receive requests from a critically large number of clients
-   simultaneously. To remedy this situation, many organizations either
+   their highly centralized client-server approach also means that it is
+   inadequate for mass publication of files, since a single point may
+   expect to be requested by a critically large number of clients
+   simultaneously. To remedy this situation many organizations either
    implement a cap on the number of simultaneous requests, or spread the
    load across multiple mirror servers. Needless to say, both approaches have
    their drawbacks, and a solution that addresses these problems is
@@ -99,11 +95,6 @@
 
 </t>
 <t>
-
-<cref>IMO, the major benefit may actually come from the ability to set
-     up mirrors and have them replicate automatically... hence the use
-     of "not only mirrors" where "not mirrors" appears in equivalent
-     sections of the BitTorrent specification</cref>
 
    The approach in the GitTorrent Protocol (GTP) is to spread the load not only across
    mirror servers, but across the clients themselves, by having them upload objects from
@@ -118,13 +109,11 @@
 <!--
 <section title="Extensions">
 <t>
-
-<cref>this should be reworded to express the true heritage of the
-     protocol, not just cut and pasted from BitTorrent</cref>
  
    The GTP is designed to be extensible to meet the future needs of
    individuals and community forums. It also allows certain optional
-   features that clients may omit in their implementation. The git community has shown that the extent that these extensions
+   features that clients may omit in their implementation. The git community has shown that
+   This document o the extent that these extensions
    have become part of what the GitTorrent community considers best
    practice they have been included in this document.  However, many
    extensions have been omitted either because they have been deemed to
@@ -150,13 +139,10 @@
 </t>
 <t>
 
-<!-- yeah.  a shame there's no RFC for that, perhaps pointing to the
-     ASCII document detailing all of the file formats would be useful
-     here. -->
-
-   It is assumed that the developers are familiar with the layout of the
-   git repository and the design of the object store. This includes the
-   use of pack files and how to validate signed tag objects.
+   It is assumed that developers are familiar with the git version
+   control system, more specifically the layout of the repository and
+   the design of the object store. This includes the use of pack files
+   and how to validate signed tag objects.
 
 </t>
 </section>
@@ -185,8 +171,8 @@
 </t>
 <t hangText="Torrent:">
  
-	A torrent is the term for a group of branches that are being
-	shared or downloaded, and all of their associated objects.
+	A torrent is the term for the group of branches that are being
+	shared or downloaded, including all of their associated objects.
 
 </t>
 <t hangText="Swarm:">
@@ -224,24 +210,8 @@
 </t>
 <t hangText="Repo hash:">
 
-       A SHA1 hash that uniquely identifies the torrent. It is calculated from
-       digesting the content of the metainfo file.
-
-<cref>could even refer to the SHA1 spec here</cref>
-
-</t>
-<t hangText="Git Object ID:">
-
-       A SHA1 hash that uniquely identifies an object in a git
-       repository.  This is similar to a SHA1 digest of the object,
-       but it is seeded with the object type and length.
-
-</t>
-<t hangText="branch">
-
-       A branch refers to a named pointer to a git commit object which
-       is the most recent commit in the version of the project
-       referred to.  They are also called "Head References".
+	A SHA1 hash that uniquely identifies the torrent. It is calculated by
+	digesting data in the metainfo file.
 
 </t>
 <t hangText="Reference object:">
@@ -360,8 +330,6 @@
    of the string in bytes, followed by a colon. E.g. the string "announce" is
    encoded as "8:announce".
 
-<cref>Consideration should be made of content encoding.</cref>
-
 </t>
 </section>
 
@@ -413,10 +381,7 @@
 	and selection is discussed in <xref
 		target="peer-selection-strategy" />.  Periodically
 	connecting to new peers will also help ensure that torrents are
-	distributed throughout the swarm faster.  Seeders SHOULD
-	reduce or eliminate this activity, to avoid idle usage of
-	bandwidth.
-	
+	distributed throughout the swarm faster.
 
 </t>
 </section>
@@ -425,16 +390,17 @@
 <t>
 
 	New tags and branch updates are announced using reference lists,
-	that contain information about what git object ID each branch
-	head refers to and the name and git object ID of available tags. The reference
+	that contain information about the git commit SHA1 of branch
+	heads and the name and SHA1 of available tags.  The reference
 	list enables a peer to know which revision history to trust and
-	consequently which objects to request. Since references may be
-	distributed using both THP and PWP, trust is ensured by
-	requiring that all reference information distributed in the
-	swarm is signed.  Peers SHOULD verify the signature using
-	the public key listed in the metainfo file.  Peers SHOULD also
-	only process updated references that the public key used to
-	sign the reference are permitted to update.
+	consequently which objects to request.  The reference list MAY be
+	distributed using both THP and PWP, however, peers SHOULD
+	prefer using the PWP to reduce resource demands on the tracker.
+	Since references lists can be fetched from untrusted neighboring
+	peers, trust is ensured by requiring that all reference
+	information distributed in the swarm is signed. A peer SHOULD
+	verify the signature of all reference lists using the public key
+	available in the metainfo file.
 
 </t>
 <t>
@@ -595,8 +561,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="The Structure of the Metainfo File">
 <t>
 
-   The metainfo file contains a bencoded dictionary with the following
-   structure. A key below is REQUIRED unless otherwise noted.
+   The metainfo file contains a bencoded dictionary where a key is
+   REQUIRED unless otherwise noted. The dictionary has the following
+   structure:
 
 </t>
 <list style="hanging">
@@ -618,38 +585,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	of the torrent in standard Unix epoch format.
 
 </t>
-<t hangText="'pubkey':">
-
-	This is a string value. It must contain the PGP key ID that is
-	used by GTP/1.0 to authorise updates to all branch heads.
-
-</t>
 <t hangText="'repo':">
 
 	This is a dictionary containing information on the repository
 	offered in the torrent.
 
 <list style="hanging">
-<t hangText="'branches':">
-
-
-	This key points to a dictionary that contains information about
-	the branches to download.
-
-<list style="hanging">
-<t hangText="'name':">
-
-	This is a string value. It contains the name of the branch.
-
-</t>
-<t hangText="'pubkey':">
-
-	This is an OPTIONAL string value. It must contain the key ID
-	that is used by GTP/1.0 to authorise each updates to a branch
-	head.  The global "pubkey" value will always be be authorised
-	to make branch updates.
-
-</t>
 <t hangText="'alternatives':">
 
 	This is an OPTIONAL list of string values. It may contain repo
@@ -659,8 +600,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	torrents.
 
 </t>
-</list>
-</t>
 <t hangText="'description':">
 
 	This is an OPTIONAL string value that may contain a description
@@ -668,46 +607,26 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	description file in the git repository.
 
 </t>
-</list>
-</t>
-<t hangText="'trackers':">
-
-	This is a list of string values. Each value is a URL
-	pointing to a tracker.
-
-</t>
-<t hangText="'keys':">
-
-	This key points to a dictionary that contains information about
-	the PGP keys used in the rest of the file.
-
-<list style="hanging">
-<t hangText="'ID':">
-
-	This is a valid shortening of the ID of the key as a string.
-
-</t>
 <t hangText="'pubkey':">
 
-	This is a string value. It MUST contain the public key that is
-	used by GTP/1.0 to verify reference objects.  It is
-	recommended to use PGP keys for this purpose, but X.509
-	certificates are reasonable substitutes.  This SHOULD be just
-	the public key with no extra signatures, except the
-	self-signature.  It is up to the client to detect the type of
-	and interpret this key.  If a client does not understand this
-	key, it SHOULD NOT process any updates from branches that list
-	this key, or if it is the top level key, it SHOULD refuse to
-	join the swarm.
+	This is a string value. It must contain the public PGP key that
+	is used by GTP/1.0 to verify reference objects.
 
 </t>
 </list>
+</t>
 <t hangText="'references':">
 
 	This key points to a string that contains a reference object.
 	The value can be sent to neighboring peers over the wire using
 	the References message.  See <xref target="references" /> for
 	instructions on how to interpret the string.
+
+</t>
+<t hangText="'trackers':">
+
+	This is a list of string values. Each value is a URL
+	pointing to a tracker.
 
 </t>
 </list>
@@ -1385,6 +1304,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	to a remote peer to inform it that it is not interested in any
 	objects from the remote peer. 
 
+	<vspace blankLines="1" />
 </t>
 </section>
 <!-- /section>
@@ -1604,6 +1524,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    neighboring peers. The objects pointed to by the git commit object with the lowest sum is then
    selected for requesting.
 
+	<vspace blankLines="1" />
 </t>
 </section>
 
@@ -1673,6 +1594,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    the security consideration section of
    <xref target="RFC2616">RFC 2616</xref>.
 
+	<vspace blankLines="1" />
 </t>
 </section>
 
