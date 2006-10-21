@@ -1397,17 +1397,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	references from the remote peer, a peer can send this message
 	with no payload. To announce to the other peer that it has a
 	new reference object available it can send this message with a
-	reference SHA1 and an empty reference object. A peer MUST NOT send
-	its current reference object unless it has been requested by the remote peer using
+	reference SHA1 and an empty object. A peer MUST NOT send
+	its current reference object unless it has been requested using
 	this method.  This reduces the impact of new reference object
-	being flooded in the network.
+	flooding the network.
 
 </t>
 <t>
 
 	The reference object is similar to the "references" string
-	returned in the tracker response. A peer receiving this
-	message must validate the resulting object using the public
+	returned in the tracker response.  A peer receiving this
+	message SHOULD validate the resulting object(s) using the public
 	key from the metainfo file and drop the connection if the
 	object has a false signature. See <xref target="references" />
 	for more instructions on how to interpret the reference
@@ -1416,34 +1416,35 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <figure>
 <artwork>
----------------------------------------------
-| Reference Object SHA1 | References Object |
----------------------------------------------</artwork>
+----------------------------------------------------------------
+| Reference SHA1 | References Length | References Object | ... |
+----------------------------------------------------------------</artwork>
 </figure>
+
+<cref>OK.  Here's one of the first changes: we send a _list_ of
+      references that we are currently dealing with.  The idea being
+      that each one defines the boundary of a pack; either the
+      beginning, or the end.
+</cref>
 </section>
 <section title="Packs">
 <t>
 
 	This message has ID 6 and a variable payload length. The
-	payload is a list of pack objects that the sender has
-	successfully downloaded, validated, and is offering.  Each pack
-	file is listed with a SHA1 uniquely identifying it, a 8-byte
-	big-endian number telling the size of the pack file, and finally
-	a 1-byte flag field. In all, 29 bytes per embedded pack object.
-	A peer can send this message with no payload to request a
-	list of pack object available from the remote peer. 
-
-</t>
-<t>
-	
-	The flag member holds information about what type of git objects
-	are in the pack. This can be used by peers to fetch the various
-	objects in a specific order, such as first downloading all
-	commit objects. The following bit flags are defined: 0-bit is
-	tag objects, 1-bit is commit objects, 2-bit is tree objects, and
-	3-bit is blob objects. The flag byte is interpreted in
-	MSB-order. If no flags are set the pack object may contain any
-	combination of objects.
+	payload is a list of pack files that the sender can offer
+	parts of, or is in the process of trying to get.  Each pack
+	file is listed with a pair of SHA1 objects uniquely
+	identifying the reference objects that identify the start and
+	end of it, and an 8-byte big-endian number telling the total
+	(uncompressed) size of all of the objects in the pack file.
+	In all, 48 bytes per virtual pack object.  A peer can send
+	this message with no payload to request the packs from the
+	remote peer.  If a pack spans to the beginning of history,
+	then the SHA1 value to use for the "Start" is the SHA1 of the
+	empty string ("da39a3...").  A peer MUST be able to return the
+	corresponding references objects for all of the references'
+	SHA1s returned by this message when asked with the
+	"References" message.
 
 </t>
 <t>
@@ -1454,77 +1455,155 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
---------------------------------------------
-| Pack SHA1 | Pack size | Pack Flags | ... |
---------------------------------------------</artwork>
+------------------------------------
+| Pack SHA1 Pair | Pack size | ... |
+------------------------------------</artwork>
 </figure>
 </t>
 </section>
-<section title="Index">
+<section title="Blocks">
 <t>
 
-	This message has ID 7 and a variable payload. The payload always
-	contains a pack SHA1. If no index data is sent the receiving
-	peer should interpret it as a request for the pack index,
-	otherwise the data of the pack index object follows. The
-	recipient MUST only send index object messages to a sender that
-	has already requested the index object.
-	
+	This message has ID 7 and a variable payload length. The
+	payload is a SHA1 pair identifying the virtual pack file of
+	which block download status are being queried or notified.  A
+	message sent without a Bitmap is a query, and one sent with
+	one is a notification (or a response to a query).  The block
+	offset and size are 32-bit integers.  The block offset must be
+	multiplied by the block size to arrive at the virtual location
+	within the pack file.
+
 </t>
 <t>
 	
-	A peer receiving this
-	message MUST send an interested message to the sender if indeed
-	it lacks any of the objects that are announced.  Further, it MAY
-	also send a request for that pack or object if it not choked by the remote peer.  The payload has
-	the following structure:
+	A peer receiving this message SHOULD send an blocks message to
+	the sender to keep it informed of the new status.  The sender
+	should only set bits in the bitmap when it knows that it has
+	all the objects that start in this block.  The bitmap is
+	interpreted byte by byte, with the lowest bit in the first
+	byte of the bitmap corresponding to the first block in the
+	range reported on.  The Size field is a one-byte integer,
+	specifying the number of valid bits in the last byte of the
+	Bitmap.
 
 <figure>
 <artwork>
-----------------------------
-| Pack SHA1 | Index Object |
-----------------------------</artwork>
+-----------------------------------------------------------------
+| Pack SHA-1 Pair | Block offset | Block length | Size | Bitmap |
+-----------------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
 </section>
 
 <section title="Data-oriented Messages">
-<section title="Request">
+<section title="Index">
 <t>
 
-	This message has ID 8 and a payload of length 28. The payload is
-	an object SHA1 followed by two integers indicating a block within
-	an object that the sender is interested in downloading from the
-	recipient. The recipient MUST only send object messages to a
-	sender that has already requested it, and only in accordance to
-	the rules given above about the choke and interested states. The
-	payload has the following structure:
+	This message has ID 8 and a variable payload.  The payload
+	always contains a two references SHA1s, a block offset and
+	length.  Without the Index Data set, it is a request for an
+	index of objects in that block.  Otherwise, it takes the form
+	described later.
+
+</t>
+<t>
 
 <figure>
 <artwork>
----------------------------------------------
-| Object SHA1 | Block Offset | Block Length |
----------------------------------------------</artwork>
+--------------------------------------------------------------
+| Pack SHA-1 Pair | Block offset | Block Length | Index Data |
+--------------------------------------------------------------</artwork>
 </figure>
+</t>
+<t>
+
+        The form of the index data is an offset into the block that
+        the first object starts, followed by a list of Object ID, a
+        byte for the type and a 4-byte integer for the length of the
+        object.  If a block is requested that a complete list of
+        objects is not available for, the Offset will be -1, and no
+        list will follow.  If no objects start within a block, the
+        Offset will be 0, and no list will follow.
+
+<cref>SV - I'm wondering whether it might be better to use BER
+      integers than specify exactly how long each integer field is...
+      not being able to send large objects might seem limiting, but at
+      the moment we're not splitting objects within blocks (too
+      complicated, and inefficient anyway), so let's not worry about
+      it...</cref>
+
+<figure>
+<artwork>
+-----------------------------------------------------
+.. | Offset | Object ID | Type | Object Length | ...
+-----------------------------------------------------</artwork>
+</figure>
+</t>
+<t>
+
+        Note that it is only necessary to use this request when
+        dealing with multiple peers which are downloading different
+        packs.  Also note that it is only guaranteed that peers have
+        the necessary information to answer this request if they have
+        all of the previous blocks to this one downloaded already.
 
 </t>
 </section>
-<section title="Block">
+<section title="Request">
 <t>
 
-	This message has ID 9 and a variable length payload. The payload
-	holds an object SHA1 and an integer indicating from which
-	object and with what offset the block data in the 3rd member is
-	derived. Note, the data length is implicit and can be calculated
-	from the total message length. The payload has the following
-	structure:
+	This message has ID 9 and a variable length payload. The
+	payload is a count of objects, a list of object IDs that the
+	sender is interested in downloading from the recipient,
+	followed by a count and a list of Commit Object IDs that
+	defines the start of a range of objects that may be used as
+	delta bases for the transmitted pack.
+
+</t>
+<t>
+
+        The peer SHOULD send the Commit IDs for all of the complete
+        heads that it posesses.  The remote end MAY ignore this list
+        and produce a "deep" pack, which does not refer to any other
+        objects for deltas.
 
 <figure>
 <artwork>
--------------------------------------------
-| Object SHA1 | Block Offset | Block Data |
--------------------------------------------</artwork>
+-----------------------------------------------
+| Count | Object ID | ... | Count | Commit ID |
+-----------------------------------------------</artwork>
+</figure>
+</t>
+<t>
+
+        This message should be considered an auxiliary method for
+        getting small amounts of missing objects when all else fails,
+        or if it can be determined that this is a lighter-weight
+        alternative to the regular pack request mechanism.
+
+</t>
+</section>
+<section title="Pack">
+<t>
+
+	This message has ID 9 and a variable length payload. The
+	payload holds a pair of reference SHA1 objects to which this
+	pack corresponds, the block offset and block length as per the
+	Index message.  The "Offset" returned is the offset into the
+	block that the first object starts.  All of these fields will
+	be all NULL if the pack is a response to the auxiliary
+	"Request" method above.  If the "Offset" and "Pack" fields are
+	not present, it is a request for the specified pack.  The pack
+	may use any object prior to it in pack, or any object
+	reachable from any of the base references, as bases for
+	deltas.
+
+<figure>
+<artwork>
+----------------------------------------------------------------
+| Pack SHA1 Pair | Block offset | Block Length | Offset | Pack |
+----------------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
