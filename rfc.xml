@@ -699,8 +699,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'repo_hash':">
 
 	This is a REQUIRED 20-byte SHA1 hash value. In order to obtain
-	this value the peer must calculate the SHA1 of the value of the
-	"repo" key in the metainfo file.
+	this value the peer must calculate the SHA1 of the metainfo
+	file.
 
 </t>
 <t hangText="'peer_id':">
