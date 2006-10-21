@@ -780,6 +780,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	down gracefully. 
 
 </t>
+<t hangText="'FIXME':">
+
+        incomplete.
+
+<cref>we seem to be missing the meat of the protocol here; what do
+      clients say to the tracker?</cref>
+
+</t>
 </list>
 </t>
 </list>
@@ -1014,10 +1022,16 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <list style="symbols">
 <t>
 
-	  The algorithm should not be constructed with the goal in mind
-	  to reduce the amount of data uploaded compared to
-	  downloaded. At the very least a peer should upload the same
-	  amount that it has downloaded.
+	  The algorithm should not be constructed with the goal in
+	  mind to unnecessarily reduce the amount of data uploaded to
+	  peers as compared to that downloaded.  A peer should
+	  endeavour to complete as many successful uploads to other
+	  peers as possible during its participation in the swarm, to
+	  the limit of its resource constraints.
+
+<cref>SV - I think this is a bit silly.  People might be on asymmetric
+           connections, they might be being charged per megabyte, etc.
+</cref>
 
 </t>
 <t>
