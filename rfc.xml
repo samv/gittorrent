@@ -482,7 +482,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	references objects must make decisions regarding how to best
 	distribute the repository references. For repositories with many
 	branches or tags, it is RECOMMENDED to split up the list of
-	references so as not to require big objects to be exchanged over
+	references so as not to require massive reels to be exchanged over
 	the wire. The same applies for repositories with frequent
 	updates, in that partial and smaller reference lists can help to
 	reduce the overhead of of exchanging many reference objects.
@@ -538,16 +538,16 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Commit-Reels">
 <t>
 
-    A commit reel is defined as a topologically sorted serialization
-    of objects between two sets of references.  It contains all of the
-    new objects that you could get if you already had all the objects
-    required for the first set of references, but not yet the second
-    set.  The objects are sorted in such a way that all of the objects
-    that a given object refers to are already available before the
-    object itself.  This is called "topological order".  However, by
-    itself this leads to ambiguity, so some extra rules are drawn to
-    make the positions of objects within the commit-reel
-    deterministic.
+    A commit reel is defined as a deterministically sorted
+    serialization of objects between two sets of references.  It
+    contains all of the new objects that you would get if you already
+    had all the objects required for the first set of references, but
+    not yet the second set.  The objects are sorted in such a way that
+    all of the objects that a given object refers to are already
+    available before the object itself.  This is called "topological
+    order".  However, by itself this leads to ambiguity, so some extra
+    rules are drawn to make the positions of objects within the
+    commit-reel deterministic.
 
 </t>
 <figure>
