@@ -449,7 +449,7 @@
 	object. However, when a peer does not have all reference objects
 	it MAY use the creation date indicated in the tag
 	object to infer a relation between two reference objects.  How
-	to verify the signed git tag is beyond the scope of this
+	to verify the authenticity of the signed git tag is beyond the scope of this
 	document.
 
 </t>
@@ -613,7 +613,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'created by':">
 
-	This is an optional string value and may contain the name and
+	This is an OPTIONAL string value and may contain the name and
 	version of the program used to create the metainfo file.
 
 </t>
@@ -677,11 +677,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    The Tracker HTTP Protocol (THP) is a simple mechanism for introducing
    peers to each other. A tracker is a HTTP service that must be
-   contacted by a peer in order to join a swarm. As such the tracker
+   contacted by a peer in order to join a swarm. As such, the tracker
    constitutes the only centralized element in GTP/1.0. A tracker does
    not by itself provide access to any downloadable data. A tracker relies on
-   peers sending regular requests. It may assume that a peer is dead if it
-   misses a request.
+   peers sending regular requests. It MAY assume that a peer is dead if it
+   does not make any requests for a long time.
 
 </t>
 
@@ -743,7 +743,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This is an OPTIONAL value, and if present should indicate the
 	true, Internet-wide address of the peer, either in dotted quad IPv4
-	format, hexadecimal IPv6 format, or a DNS name. When not present the
+	format, hexadecimal IPv6 format, or a DNS name. When not present, the
 	tracker will derive the IP address from the request connection.
 
 </t>
@@ -801,15 +801,15 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This key is OPTIONAL. If present, the dictionary MUST NOT contain any
 	other keys. The peer should interpret this as if the attempt to join
 	the torrent failed. The value is a human readable string containing an
-	error message with the failure reason.
+	error message with the reason for failure.
 
 </t>
 <t hangText="'interval':">
 
-	A peer must send regular HTTP GET requests to the tracker to
+	A peer MUST send regular HTTP GET requests to the tracker to
 	obtain an updated list of peers and update the tracker of its
 	status. The value of this key indicated the amount of time
-	that a peer should wait between two consecutive regular
+	that a peer should wait between consecutive regular
 	requests. This key is REQUIRED.
     
 </t>
