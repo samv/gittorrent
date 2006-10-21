@@ -1700,7 +1700,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    The only lacking element from the above algorithm is the capability
    to ensure that new peers can have a fair chance of downloading a
-   object, even though they would evaluate poorly in the above schema.
+   object, even though they would evaluate poorly in the above scheme.
    A simple method is to make sure that a random peer is selected
    periodically regardless of how it evaluates. Since this process is repeated in a round
    robin manner, it ensures that ultimately even new peers will have a
