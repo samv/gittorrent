@@ -11,6 +11,9 @@ man:	rfc
 html:	rfc
 	xml2rfc rfc.xml rfc.html
 
+publish: html
+	scp rfc.html `cat .publish_target`
+
 rfc:	rfc.xml refs.stamp
 
 refs.stamp:
