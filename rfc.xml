@@ -388,8 +388,11 @@
 
 	Once a peer has a complete copy of the current torrent, it
 	becomes a Seeder and MAY quiesesce, only passively processing
-	requests for downloads and receiving reference updates.  If it
-	receives a suitably authorized reference update via PWP, it
+	requests for downloads and receiving reference updates, and
+	contacting the tracker at the minimum negotiated frequency.
+	If it receives a suitably authorized reference update via PWP
+	or a periodic update returns a new set of repository
+	references, it
 	MUST no longer consider itself a Seeder, and start fetching
 	the new content.  This is one key difference to the BitTorrent
 	protocol, in which individual torrents do not update.  Seeders
