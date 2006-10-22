@@ -14,8 +14,8 @@
 <?rfc inline='yes'?>
 <?rfc compact='no'?>
 <?rfc editing='no'?>
-<?rfc header='GTP/1.0'?>
-<?rfc private='GitTorrent Protocol version 1.0'?>
+<?rfc header='GTP/0.1'?>
+<?rfc private='GitTorrent Protocol version 0.1'?>
 <?rfc subcompact='no'?>
 <?rfc toc='yes'?>
 <?rfc tocindent='no'?>
@@ -24,7 +24,7 @@
 
 <front> <!-- ======================================================= -->
 
-<title>GitTorrent Protocol -- GTP/1.0</title>
+<title>GitTorrent Protocol -- GTP/0.1</title>
 
 <author initials='J.F.' surname='Fonseca' fullname='Jonas Fonseca'>
 	<organization>DIKU</organization>
@@ -41,8 +41,8 @@
 <abstract>
 <t>
 
-   This document describes the GitTorrent Protocol version 1.0, referred
-   to as "GTP/1.0". The GitTorrent Protocol (GTP) is a protocol for
+   This document describes the GitTorrent Protocol version 0.1, referred
+   to as "GTP/0.1". The GitTorrent Protocol (GTP) is a protocol for
    collaborative git repository distribution across the Internet. It is
    best classified as a peer-to-peer (P2P) protocol, although it also
    contains centralized elements.
@@ -308,7 +308,7 @@
 <section title="Bencoding ">
 <t>
 
-   Bencoding encodes data in a platform independent way.  In GTP/1.0 the
+   Bencoding encodes data in a platform independent way.  In GTP/0.1 the
    metainfo file and all responses from the tracker are encoded in the
    bencoding format. The format specifies two scalar types (integers and
    strings) and two compound types (lists and dictionaries).
@@ -688,7 +688,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'pubkey':">
 
 	This is a string value. It must contain the public PGP key that
-	is used by GTP/1.0 to verify reference objects.
+	is used by GTP/0.1 to verify reference objects.
 
 </t>
 </list>
@@ -718,7 +718,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    The Tracker HTTP Protocol (THP) is a simple mechanism for introducing
    peers to each other. A tracker is a HTTP service that must be
    contacted by a peer in order to join a swarm. As such, the tracker
-   constitutes the only centralized element in GTP/1.0. A tracker does
+   constitutes the only centralized element in GTP/0.1. A tracker does
    not by itself provide access to any downloadable data. A tracker relies on
    peers sending regular requests. It MAY assume that a peer is dead if it
    does not make any requests for a long time.
@@ -752,7 +752,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'port':">
 
 	The port number that the peer is listening to for incoming
-	connections from other peers. GTP/1.0 does not specify a
+	connections from other peers. GTP/0.1 does not specify a
 	standard port number, nor a port range to be used. This key is REQUIRED.
 
 </t>
@@ -1110,7 +1110,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    The local peer opens a port on which to listen for incoming
    connections from remote peers. This port is then reported to the
-   tracker. As GTP/1.0 does not specify any standard port for listening, it is
+   tracker. As GTP/0.1 does not specify any standard port for listening, it is
    the sole responsibility of the implementation to select a port.
 
 </t>
@@ -1148,7 +1148,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="Name Length:">
 
 	The unsigned value of the first byte indicates the length of a
-	character string containing the protocol name. In GTP/1.0 this
+	character string containing the protocol name. In GTP/0.1 this
 	number is 19. The local peer knows its own protocol name and
 	hence also the length of it. If this length is different than
 	the value of this first byte, then the connection MUST be
@@ -1161,7 +1161,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	the protocol in ASCII and have the same length as given in the
 	Name Length field. The protocol name is used to
 	identify to the local peer which version of GTP the remote peer
-	uses. In GTP/1.0 the name is 'GitTorrent protocol'. If this
+	uses. In GTP/0.1 the name is 'GitTorrent protocol'. If this
 	string is different from the local peers own protocol name, then
 	the connection is to be dropped.
 
@@ -1212,7 +1212,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </list>
 <t>
 
-   In GTP/1.0 the handshake has a total of 68 bytes.
+   In GTP/0.1 the handshake has a total of 68 bytes.
 
 <cref>SV - what is the handshake response?  Another similar message?</cref>
 
@@ -1332,7 +1332,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="Message ID:">
 
 	This is a one byte value, indicating the type of the message.
-	GTP/1.0 specifies 11 different messages that are presented
+	GTP/0.1 specifies 11 different messages that are presented
 	below.
 
 </t>
@@ -1361,7 +1361,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
 
-	Following, are the messages specified in GTP/1.0.
+	Following, are the messages specified in GTP/0.1.
 
 </t>
 </section>
@@ -1698,7 +1698,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Object Selection Strategy">
 <t>
 
-   GTP/1.0 does not force a particular order for selecting which objects
+   GTP/0.1 does not force a particular order for selecting which objects
    to download. However, downloading in
    rarest-first order can lessen the wait time for objects. To find
    the rarest objects a client must calculate for each git commit object the
@@ -1761,7 +1761,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    
-   This section examines security considerations for GTP/1.0.The
+   This section examines security considerations for GTP/0.1.The
    discussion does not include definitive solutions to the problems
    revealed, though it does make some suggestions for reducing
    security risks.
@@ -1772,7 +1772,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    The use of the HTTP protocol for communication between the tracker
-   and the client makes GTP/1.0 vulnerable to the attacks mentioned in
+   and the client makes GTP/0.1 vulnerable to the attacks mentioned in
    the security consideration section of
    <xref target="RFC2616">RFC 2616</xref>.
 
@@ -1813,7 +1813,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="DNS Spoofing">
 <t>
 
-   Clients using GTP/1.0 rely heavily on the Domain Name Service,
+   Clients using GTP/0.1 rely heavily on the Domain Name Service,
    which can be used for both specifying the URI of the tracker and how
    to contact a peer.  Clients are thus generally prone to security
    attacks based on the deliberate mis-association of IP addresses and
@@ -1823,7 +1823,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
 
-   In particular, GTP/1.0 clients SHOULD rely on their name resolver
+   In particular, GTP/0.1 clients SHOULD rely on their name resolver
    for confirmation of an IP number/DNS name association, rather than
    caching the result of previous host name lookups. If clients cache
    the results of host name lookups in order to achieve a performance
