@@ -324,13 +324,13 @@
    dictionary = "d" 1*(string anytype) "e" ; non-empty dictionary
    list       = "l" 1*anytype "e"          ; non-empty list
    integer    = "i" signumber "e" 
-   string     = number ":" &lt;number long sequence of any CHAR&gt;
+   string     = number ":" 1*CHAR
    anytype    = dictionary / list / integer / string
-   signumber  = "-" number / number
+   signumber  = number / ("-" number)
    number     = 1*DIGIT
    CHAR       = %x00-FF                    ; any 8-bit character
-   DIGIT      = "0" / "1" / "2" / "3" / "4" /
-                "5" / "6" / "7" / "8" / "9"</artwork>
+   DIGIT      = %x30-39                    ; 0-9
+   </artwork>
 </figure>
 
 <section title="Scalar Types">
