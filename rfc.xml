@@ -275,7 +275,6 @@
 	The torrent must be downloaded by connecting to peers in the
 	swarm and trading objects using PWP.
 
-	<vspace blankLines="1" />
 </t>     
 </list>
 <t>
@@ -1126,12 +1125,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    the remote peer.
 
 </t>
-<!-- t>
-	&nbsp;
-</t>
-<t>
-	&nbsp;
-</t-->
 <t>
 
 
@@ -1402,17 +1395,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	to a remote peer to inform it that it is not interested in any
 	objects from the remote peer. 
 
-	<vspace blankLines="1" />
 </t>
 </section>
-<!-- /section>
-
-	<vspace blankLines="4" />
-	
-	and guidelines regarding Reference
-	messages.
-
-<section title="Repository-oriented Messages" -->
 <section title="Peers">
 <t>
 
@@ -1706,7 +1690,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    neighboring peers. The objects pointed to by the git commit object with the lowest sum is then
    selected for requesting.
 
-	<vspace blankLines="1" />
 </t>
 </section>
 
@@ -1776,7 +1759,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    the security consideration section of
    <xref target="RFC2616">RFC 2616</xref>.
 
-	<vspace blankLines="1" />
 </t>
 </section>
 
