@@ -425,6 +425,19 @@
 		considerations, for developers creating and system
 		administrators using trackers.
 
+	JF - [RFC] Static "tracker" service
+
+		It is an alternative method for allowing new peers to
+		join the network, for gittorrent networks that do not
+		have a dynamic tracker where peers can sign in. For
+		scalability this could also be placed in a DHT.
+
+		Optionally, the metainfo file can contain URLs to
+		statically served files containing a list of peers. A
+		peer in the network can periodically update it.  A
+		problem with this method is that new peers do not get
+		"advertised" by the tracker.
+
 	<cref>
 
 </t>
