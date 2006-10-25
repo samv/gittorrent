@@ -229,7 +229,7 @@
 <t hangText="Repo hash:">
 
 	A SHA1 hash that uniquely identifies the torrent. It is calculated by
-	digesting data in the metainfo file.
+	digesting the 'repo' key in the metainfo file.
 
 </t>
 <t hangText="Reference object:">
@@ -738,8 +738,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'repo_hash':">
 
 	This is a REQUIRED 20-byte SHA1 hash value. In order to obtain
-	this value the peer must calculate the SHA1 of the metainfo
-	file.
+	this value the peer must calculate the SHA1 of the 'repo' key
+	in the metainfo file.
 
 </t>
 <t hangText="'peer_id':">
@@ -1047,8 +1047,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="Repo Hash:">
 
-	The next 20 bytes in the handshake specify the
-	20-byte SHA1 of the metainfo file.
+	The next 20 bytes in the handshake specify the repo hash.
 	Presumably, since both the local and the remote peer contacted
 	the tracker as a result of reading in the same ".gittorrent" file,
 	the local peer will recognize the repo hash value and will be
