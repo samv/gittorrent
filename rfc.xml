@@ -391,6 +391,24 @@
 	peers through its neighboring peers to reduce resource demands on
 	the tracker.
 
+	<cref>
+
+	JF - Comment recommendation on using peer network over tracker
+
+		Does this make it harder for new peers to get connected?
+		If many peers will choose not to collect peer info via
+		the tracker, could it end up making it harder for new
+		peers to get connected? This also depends on how the
+		tracker serves peers, e.g. whether new peers are
+		prioritized over older peers.
+
+		On the other hand, it does save some tracker bandwidth.
+		For example, if the peer checks in every 15 minutes,
+		would that have been long enough for the peer info to
+		have been spread through the network?
+
+	<cref>
+
 </t>
 <t>
 
