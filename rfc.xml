@@ -778,7 +778,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	many seeders are in the swarm.
 
 </t>
-<t hangText="'ip':">
+<t hangText="'address':">
 
 	This is an OPTIONAL value, and if present should indicate the
 	true, Internet-wide address of the peer, either in dotted quad IPv4
@@ -886,9 +886,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	ID of the peer.
       
 </t>
-<t hangText="'ip':">
+<t hangText="'address':">
 
-	This is a REQUIRED string value indicating the IP address of the peer.
+	This is a REQUIRED string value indicating the Internet-wide address of the peer.
 	This may be given as a dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.
 
 </t>
@@ -1275,7 +1275,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This message has ID 4 and a variable payload length. The payload
 	is a list of peers each with the self-designated peer ID, the port
-	number, and the IP address of the peer.  The IP address may be given as a
+	number, and the Internet address of the peer.  The address may be given as a
 	dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.  A
 	peer can send this message with no payload to request peer
 	lists from the remote peer.  See <xref target="peers" />
@@ -1283,9 +1283,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
---------------------------------------------------------
-| Peer ID | Peer Port | Peer IP Length | Peer IP | ... |
---------------------------------------------------------</artwork>
+------------------------------------------------------------------
+| Peer ID | Peer Port | Peer Address Length | Peer Address | ... |
+------------------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
