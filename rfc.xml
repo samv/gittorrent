@@ -1183,7 +1183,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	These messages handle the requesting and sending of data
 	portions. The following messages fall into this category:
-	Index, Request, and Cancel.
+	Index, Request, Reel, and Cancel.
 
 </t>
 </list>
