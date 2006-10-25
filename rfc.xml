@@ -72,7 +72,7 @@
 <cref>SV - also, mirrors are automatically used as soon as they are
       added, instead of requiring mirror administrators to configure
       and advertise them</cref>
-  
+
 </t>
 </abstract>
 
@@ -126,7 +126,7 @@
 
 <cref>SV - this should be reworded to express the true heritage of the
      protocol, not just cut and pasted from BitTorrent</cref>
- 
+
    The GTP is designed to be extensible to meet the future needs of
    individuals and community forums. It also allows certain optional
    features that clients may omit in their implementation. The git community has shown that
@@ -188,7 +188,7 @@
 
 </t>
 <t hangText="Torrent:">
- 
+
 	A torrent is the term for the group of branches that are being
 	shared or downloaded, including all of their associated objects.
 
@@ -213,7 +213,7 @@
 <t hangText="Metainfo file:">
 
 	A text file that holds information about the torrent, e.g. the
-	URL of the tracker. It usually has the extension .gittorrent. 
+	URL of the tracker. It usually has the extension .gittorrent.
 
 </t>
 <t hangText="Peer ID:">
@@ -255,7 +255,7 @@
 <t>
 
    In order for a client to download a torrent the following steps must
-   be carried through: 
+   be carried through:
 
 </t>
 <list style="numbers">
@@ -268,14 +268,14 @@
 
 	Instructions that will allow the client to contact other peers
 	must be periodically requested from the tracker using THP.
-   
+
 </t>
 <t>
 
 	The torrent must be downloaded by connecting to peers in the
 	swarm and trading objects using PWP.
 
-</t>     
+</t>
 </list>
 <t>
 
@@ -293,7 +293,7 @@
 	A metainfo file pointing to the tracker and containing
 	information on the structure of the torrent must be produced and
 	published.
-    
+
 </t>
 <t>
 
@@ -323,7 +323,7 @@
 <artwork type="abnf">
    dictionary = "d" 1*(string anytype) "e" ; non-empty dictionary
    list       = "l" 1*anytype "e"          ; non-empty list
-   integer    = "i" signumber "e" 
+   integer    = "i" signumber "e"
    string     = number ":" 1*CHAR
    anytype    = dictionary / list / integer / string
    signumber  = number / ("-" number)
@@ -498,7 +498,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t>
    The torrent is considered to be the entire tree of "objects"
-   referred to by its current list of references.  
+   referred to by its current list of references.
    Each object is named using a SHA1 hash which allows the peer to
    verify the contents of a single object, as well as refer to any
    object in the repository using a single namespace.  Using the
@@ -604,10 +604,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
     cannot be performed deterministically over the entire swarm
     without sacrificing much compression ratio and hence the total
     download requirements of peers.
-
-</t>
-<t>
-
 
 </t>
 </section>
@@ -858,7 +854,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t hangText="'stopped':">
 
 	This value SHOULD be sent to the tracker when the peer is shutting
-	down gracefully. 
+	down gracefully.
 
 </t>
 </list>
@@ -896,7 +892,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	status. The value of this key indicated the amount of time
 	that a peer should wait between consecutive regular
 	requests, in seconds. This key is REQUIRED.
-    
+
 <cref>SV - here, the server is just notifying us of how long it will
       store our session information, ie for how long the peer ID it
       has issued us (and the buffer of information the server is
@@ -955,7 +951,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	ID of the peer.
 
 <cref>SV - "server issued"</cref>
-      
+
 </t>
 <t hangText="'address':">
 
@@ -1033,7 +1029,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 <t>
-  
+
 	  The algorithm should not use a strict tit-for-tat scheme when
 	  dealing with remote peers that have just joined the swarm
 	  and thus have no objects to offer.
@@ -1070,7 +1066,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    the sole responsibility of the implementation to select a port.
 
 </t>
-<t> 
+<t>
 
    Any remote peer wishing to communicate with the local peer must open
    a TCP connection to this port and perform a handshake operation. The
@@ -1083,7 +1079,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 <t>
-
 
    A handshake is a string of bytes with the following structure:
 
@@ -1181,7 +1176,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    messages to each other in a completely asynchronous fashion. PWP
    messages have the dual purpose of updating the state of neighboring
    peers with regard to changes in the local peer, as well as transferring
-   data blocks between neighboring peers. 
+   data blocks between neighboring peers.
 
 </t>
 <t>
@@ -1281,7 +1276,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	value.  Thus an implementation MAY choose to specify a different
 	limit, and for instance disconnect a remote peer that wishes to
 	communicate using a message length that would put too much
-	strain on the local peer's resources. 
+	strain on the local peer's resources.
 
 </t>
 <t hangText="Message ID:">
@@ -1302,7 +1297,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    If an incoming message in any way violates this structure then the
    connection SHOULD be dropped.  In particular the receiver SHOULD make
    sure the payload
-   matches the the expected payload, as given below. 
+   matches the the expected payload, as given below.
 
 </t>
 <t>
@@ -1327,7 +1322,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This message has ID 0 and no payload. A peer sends this message
 	to a remote peer to inform the remote peer that it is being
-	choked. 
+	choked.
 </t>
 </section>
 <section title="Unchoke">
@@ -1336,7 +1331,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This message has ID 1 and no payload. A peer sends this message
 	to a remote peer to inform the remote peer that it is no longer
 	being choked.
-	   
 
 </t>
 </section>
@@ -1347,7 +1341,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	to a remote peer to inform the remote peer of its desire to
 	request objects.
 
-
 </t>
 </section>
 <section title="Uninterested">
@@ -1355,7 +1348,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This message has ID 3 and no payload. A peer sends this message
 	to a remote peer to inform it that it is not interested in any
-	objects from the remote peer. 
+	objects from the remote peer.
 
 </t>
 </section>
@@ -1435,7 +1428,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 <t>
-	
+
 	A peer receiving this message SHOULD send a request for the
 	blocks list to the sender to keep it informed of any new
 	objects the remote peer has downloaded.
@@ -1462,7 +1455,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 <t>
-	
+
 	A peer receiving this message SHOULD send a blocks message to
 	the sender to keep it informed of the new status, if it has
 	changed since the last corresponding response to the sender.
@@ -1660,7 +1653,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    This section describes the choking algorithm recommended for selecting
    neighboring peers with whom to exchange objects.  Implementations are
-   free to implement any strategy as long as the guidelines in 
+   free to implement any strategy as long as the guidelines in
    <xref target="peer-wire-guidelines" /> are observed.
 </t>
 <t>
@@ -1675,8 +1668,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    into account factors such as the remote peers willingness to maintain
    an unchoked connection with the client over a certain period of time,
    the remote peers upload rate to the client and other implementation
-   defined criteria.   
-</t>  
+   defined criteria.
+</t>
 
 <t>
  The peers are sorted according to their rating with regard to the
@@ -1705,7 +1698,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Security Consideration" anchor="security-considerations">
 <t>
 
-   
    This section examines security considerations for GTP/0.1.The
    discussion does not include definitive solutions to the problems
    revealed, though it does make some suggestions for reducing
@@ -1732,7 +1724,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    the tracker can be starved. This type of attack is hard to defend
    against, however, the metainfo file allows for multiple trackers to
    be specified, making it possible to spread the load on a number of
-   trackers, and thus containing such an attack. 
+   trackers, and thus containing such an attack.
 
 </t>
 </section>
@@ -1856,7 +1848,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    Some clients include information about themselves when generating
    the peer ID string. Clients should be aware that this information
    can potentially be used to determine whether a specific client has
-   a exploitable  security hole.
+   a exploitable security hole.
 
 </t>
 </section>
