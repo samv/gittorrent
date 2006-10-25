@@ -834,7 +834,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <cref>SV - this seems a little weird.  why just a number?  Not a
       number and offset to let you page through all the references?
       Are you just supposed to keep sending requests with a bigger
-      number until you get them all?  </cref>
+      number until you get them all?
+
+      Ok, so, say that we are issued a Peer ID.  Then we're saying
+      "give me N more references objects that I didn't know about."
+      </cref>
 
 </t>
 <t hangText="'event':">
@@ -860,7 +864,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 
 <cref>SV - How about we also request an update interval, rather than
-          forcing the server to pick a low one.</cref>
+          forcing the server to pick a low one.  It's really telling
+          the server how long we intend to listen on the port
+          for.</cref>
 
 </list>
 </section>
@@ -937,7 +943,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <cref>SV - if we send the tracker a list of current peers, we can get
            the server to confirm them.  If the THP server MUST list
            known peers for all of the peers that it was sent, then the
-           client MAY, if it has contacted all of the tracker
+           client MAY, if it has recently contacted all of the tracker
            addresses, drop the connection on un-mentioned
            peers.</cref>
 
@@ -947,7 +953,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This is a REQUIRED string value containing the self-designated
 	ID of the peer.
 
-<cref>SV - "server issued"</cref>
+<cref>SV - "server issued"; on first requests, it will be missing</cref>
       
 </t>
 <t hangText="'address':">
@@ -966,6 +972,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	port number of the peer. This key is REQUIRED.
 
 </t>
+
+<cref>SV - server could return per-peer "confirmed uploads" or
+           something else based on checking reported uploads to peers
+           with reported downloads from those peers.</cref>
+
 </list>
 </t>
 <t hangText="'references':">
@@ -975,6 +986,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	neighboring peers over the wire using the References message.
 	See <xref target="references" /> for instructions on how
 	to interpret the string.
+
+<cref>SV - This would need added - "that haven't been sent to your
+           peer ID already"</cref>
 
 </t>
 </list>
@@ -1141,6 +1155,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	the local peers own ID name, the connection MUST be dropped.  Also, if
 	any other peer has already identified itself to the local peer using
 	that same peer  ID, the connection MUST be dropped.
+
+<cref>SV - this "self-designated name" should be issued by the
+           tracker, but of course the server 
 
 </t>
 </list>
