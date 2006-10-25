@@ -19,6 +19,7 @@
 <?rfc subcompact='no'?>
 <?rfc toc='yes'?>
 <?rfc tocindent='no'?>
+<?rfc comments='yes'?>
 
 <rfc>
 
@@ -407,6 +408,9 @@
 		would that have been long enough for the peer info to
 		have been spread through the network?
 
+	</cref>
+	<cref>
+
 	JF - [RFC] Tracker Considerations
 
 		Some recommendations:
@@ -424,6 +428,9 @@
 		in the RFC containing recommendations and
 		considerations, for developers creating and system
 		administrators using trackers.
+
+	</cref>
+	<cref>
 
 	JF - [RFC] Static "tracker" service
 
@@ -472,6 +479,9 @@
 	<cref>
 
 		JF: The BitTorrent reference should probably go to the intro
+
+	</cref>
+	<cref>
 
 		JF: This section is not so much about discovering peers
 		but the recommended "role" or behavior of a seeder vs. a
@@ -555,6 +565,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 		offer a method for peers to announce which references
 		they are fetching, and must therefore fetch all
 		reference objects to stay updated.
+
+	</cref>
+	<cref>
 
 	JF - [RFC] Pruning objects from rebased branches
 
