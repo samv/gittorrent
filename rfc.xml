@@ -795,10 +795,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	only be interpreted as an approximation that can help to estimate how
 	many seeders are in the swarm.
 
-<cref>how about - we send the tracker which references we have or are
-      in the process of getting, and how far through them we are.  and
-      only if they haven't been changed last time this "session" (ie,
-      for my peer ID)</cref>
+<cref>SV - how about - we send the tracker which commit-reels we got
+      we have or are in the process of getting (or ones that we made
+      up that we want), and how far through them we are.  and only if
+      their progress hasn't changed last time this "session" (ie, for
+      my peer ID).  and, only in chains of reels ending in references
+      that the server has given us during the lifetime of this peer ID
+      :).
+
+      And if we say that commit-reels must be explicitly canceled,
+      then this doesn't need to overload every request by telling the
+      server all the reels that we have.</cref>
 
 </t>
 <t hangText="'address':">
@@ -894,16 +901,30 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'complete':">
 
-	This is an integer that indicates the total number of seeders
-	of the complete set of references we told the server we were
-	requesting.  This key is OPTIONAL.
+	This is an integer that indicates the number of seeders. This
+	key is OPTIONAL.
+
+<cref>SV - if we told the servers which packfiles we are after, then
+           "number of seeders" refers to the number of people who have
+           packfiles ending at all the packfiles we told the tracker
+           we were interested in.  Alternatively, the minimum number
+           of active peers who have complete packfiles ending in (or
+           after) the packfiles we want.  In a sense, we are
+           aggregating a statistic that is really per-pack.</cref>
 
 </t>
 <t hangText="'incomplete':">
 
-	This is an integer that indicates the number of peers that are
-	downloading (parts of) the set of references we told the
-	server about. This key is OPTIONAL.
+	This is an integer that indicates the number of peers downloading
+	the torrent. This key is OPTIONAL.
+
+<cref>SV - again, if we told the servers which packfiles we are after,
+           then "number of incomplete" might refer to a number of
+           things.  Peers might be downloading different sets of
+           packs, if they all chose different references.  Probably
+           the best definition is the same basis that the "complete"
+           was calculated on, but only those people who are still in
+           progress.</cref>
 
 </t>
 <t hangText="'peers':">
