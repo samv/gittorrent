@@ -91,7 +91,7 @@
 </t>
 <t>
 
-   The existing distribution protocol provides secure and reliable
+   The existing distribution protocols provide secure and reliable
    transmission of large git repositories over the Internet. However,
    their highly centralized client-server approach also means that it is
    inadequate for mass publication of files, since a single point may
@@ -394,7 +394,7 @@
 </t>
 <t>
 
-	While downloading, A peer SHOULD continously discover new peers while it is
+	While downloading, a peer SHOULD continously discover new peers while it is
 	connected to the swarm to find peers that provide better
 	download rates than its current neightboring peers.  Peer rating
 	and selection is discussed in <xref
@@ -686,7 +686,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'pubkey':">
 
-	This is a string value. It must contain the public PGP key that
+	This is a string value. It MUST contain the public PGP key that
 	is used by GTP/0.1 to verify reference objects.
 
 </t>
@@ -1385,8 +1385,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	references from the remote peer, a peer can send this message
 	with no payload. To announce to the other peer that it has a
 	new reference object available it can send this message with a
-	reference SHA1 and an empty object. A peer MUST NOT send
-	its current reference object unless it has been requested using
+	reference SHA1 and an empty reference object. A peer MUST NOT send
+	its current reference object unless it has been requested by the remote peer using
 	this method.  This reduces the impact of new reference object
 	flooding the network.
 
