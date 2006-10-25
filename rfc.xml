@@ -388,7 +388,7 @@
 	can be requested from a neighboring peer. A tracker MAY be used
 	as the initial method for seeding the peer's list of other peers
 	in the swarm, after which the peer SHOULD prefer to discover
-	peers through its neighboring peer to reduce resource demands on
+	peers through its neighboring peers to reduce resource demands on
 	the tracker.
 
 </t>
@@ -397,9 +397,9 @@
 	While downloading, a peer SHOULD continously discover new peers while it is
 	connected to the swarm to find peers that provide better
 	download rates than its current neightboring peers.  Peer rating
-	and selection is discussed in <xref
+	and selection are discussed in <xref
 		target="peer-selection-strategy" />.  Periodically
-	connecting to new peers will also help ensure that torrents are
+	connecting to new peers will also help ensure that reference updates are
 	distributed throughout the swarm faster.
 
 </t>
@@ -410,8 +410,7 @@
 	requests for downloads and receiving reference updates, and
 	contacting the tracker at the minimum negotiated frequency.
 	If it receives a suitably authorized reference update via PWP
-	or a periodic check returns a new set of repository
-	references, it MUST no longer consider itself a Seeder, and
+	or THP, it MUST no longer consider itself a Seeder, and
 	start fetching the new content.  This is one key difference to
 	the BitTorrent protocol, in which individual torrents do not
 	update.  Seeders MAY check with the tracker more frequently to
@@ -420,6 +419,16 @@
 	that peer will start attempting to transfer the new reference
 	list and objects to its peers that used to be considered
 	Seeders.
+
+	<cref>
+
+		JF: The BitTorrent reference should probably go to the intro
+
+		JF: This section is not so much about discovering peers
+		but the recommended "role" or behavior of a seeder vs. a
+		downloading peer.
+
+	</cref>
 
 </t>
 </section>
