@@ -774,7 +774,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	event to the tracker. This key is REQUIRED.
 
 <cref>SV - I think we should have here, which peer IDs you uploaded
-      how many kB of packfile to</cref>
+      how many kB of packfile and index to</cref>
 
 </t>
 <t hangText="'downloaded':">
@@ -784,7 +784,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	since it sent the "started" event to the tracker. This key is REQUIRED.
 
 <cref>SV - And here, which peer IDs you received how many kB of
-      packfile from</cref>
+      packfile and index from</cref>
 
 </t>
 <t hangText="'completed':">
