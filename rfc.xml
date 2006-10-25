@@ -699,13 +699,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'references':">
 
-	This key points to a string that contains a reference object.
-	The value can be sent to neighboring peers over the wire using
+	This key points to a list of strings each containing a reference object.
+	The values can be sent to neighboring peers over the wire using
 	the References message.  See <xref target="references" /> for
-	instructions on how to interpret the string.
+	instructions on how to handle reference objects.
 
-<cref>SV - What is the significance of this one here?  Why not a list
-      here?</cref>
+<cref>SV - What is the significance of this one here?</cref>
 
 </t>
 <t hangText="'trackers':">
