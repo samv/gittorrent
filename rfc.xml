@@ -546,6 +546,16 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	<cref>
 
+	JF - [RFC] Partial fetching of references
+
+		Briefly mention partial fetching and any caveats:
+
+		A peer MAY choose to only fetch a subset of the
+		references offered in the torrent. GTP/0.1 does not
+		offer a method for peers to announce which references
+		they are fetching, and must therefore fetch all
+		reference objects to stay updated.
+
 	JF - [RFC] Pruning objects from rebased branches
 
 		There is the issue of how a peer should handle branches
