@@ -407,6 +407,24 @@
 		would that have been long enough for the peer info to
 		have been spread through the network?
 
+	JF - [RFC] Tracker Considerations
+
+		Some recommendations:
+
+		- A tracker SHOULD advertise new peers by including
+		  their address in the peer list of responses.
+
+		- A tracker SHOULD try to pair up new peers with peers
+		  who have reported that they have downloaded something,
+		  so new peer do not end up connecting to other new
+		  coming peers.
+
+		NOTE: The RFC is lacking in detailed regarding the
+		tracker, so there should maybe exist a section someplace
+		in the RFC containing recommendations and
+		considerations, for developers creating and system
+		administrators using trackers.
+
 	<cref>
 
 </t>
