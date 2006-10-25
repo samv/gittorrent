@@ -1183,7 +1183,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	These messages handle the requesting and sending of data
 	portions. The following messages fall into this category:
-	Index, Request, Reel, and Cancel.
+	Scan, Request, Play, and Cancel.
 
 </t>
 </list>
@@ -1464,7 +1464,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 
 <section title="Data-oriented Messages">
-<section title="Index">
+<section title="Scan">
 <t>
 
 	This message has ID 8 and a variable payload.  The payload
@@ -1550,17 +1550,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
         This message should be considered an auxiliary method for
         getting small amounts of missing objects when all else fails,
         or for situations where it is determined to be a light-weight
-        alternative to the regular reel request mechanism.
+        alternative to the regular "Play" request mechanism.
 
 </t>
 </section>
-<section title="Reel">
+<section title="Play">
 <t>
 
 	This message has ID 10 and a variable length payload. The
 	payload holds a pair of reference SHA1 objects to which this
 	commit-reel corresponds, and the block offset and block length
-	as per the Index message.  The "Offset" returned is the offset
+	as per the Scan message.  The "Offset" returned is the offset
 	into the block that the first object starts.  If the "Block
 	Length" is zero, the pack is a response to the auxiliary
 	"Request" method above, and the "Reel SHA1 Pair" arbitrarily
