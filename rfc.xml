@@ -757,7 +757,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	self-designated ID of the peer.
 
 <cref>SV - why don't we just return these to the sender, as receipts
-      for connection?</cref>
+      for connection?  Then it can be OPTIONAL - and if specified, the
+      server SHOULD allocate that identifier, if it is free.</cref>
 
 </t>
 <t hangText="'port':">
@@ -953,7 +954,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This is a REQUIRED string value containing the self-designated
 	ID of the peer.
 
-<cref>SV - "server issued"; on first requests, it will be missing</cref>
+<cref>SV - "server issued"</cref>
       
 </t>
 <t hangText="'address':">
@@ -1156,8 +1157,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	any other peer has already identified itself to the local peer using
 	that same peer  ID, the connection MUST be dropped.
 
-<cref>SV - this "self-designated name" should be issued by the
-           tracker, but of course the server 
+<cref>SV - this "self-designated name" should have been issued by the
+           tracker, but of course the peer is a free thinking
+           implementation and therefore can make its own mind up
+           whether or not to play the way that the tracker
+           recommends.</cref>
 
 </t>
 </list>
