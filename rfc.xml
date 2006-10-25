@@ -963,11 +963,13 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	<cref>
 
-		JF - Suggestion: Allow the tracker to "redirect" peers to
-		a secondary tracker as a form of "load balanceing".
-		Question is if this is really needed, and it also adds
-		the problem that peers can end up being constantly
-		redirected between two trackers.
+	JF - [RFC] Load balancing trackers using peer redirection
+
+		Allow the tracker to "redirect" peers to a secondary
+		tracker as a form of "load balancing".  Question is if
+		this is really needed, and it also adds the problem that
+		peers can end up being constantly redirected between
+		trackers.
 
 	</cref>
 
