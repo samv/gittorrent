@@ -699,11 +699,17 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	the References message.  See <xref target="references" /> for
 	instructions on how to interpret the string.
 
+<cref>SV - What is the significance of this one here?  Why not a list
+      here?</cref>
+
 </t>
 <t hangText="'trackers':">
 
 	This is a list of string values. Each value is a URL
 	pointing to a tracker.
+
+<cref>SV - What is the significance of multiple trackers?  Should
+      clients join all or just one?</cref>
 
 </t>
 </list>
@@ -733,6 +739,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    be parametrized as specified in the HTTP protocol. The following parameters
    must be present in the request:
 
+<cref>SV - we might need this to be a POST, if we are to send more
+           information, like references progress</cref>
+
 </t>
 <list style="hanging">
 <t hangText="'repo_hash':">
@@ -746,6 +755,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This is a REQUIRED string and must contain the 20-byte
 	self-designated ID of the peer.
+
+<cref>SV - why don't we just return these to the sender, as receipts
+      for connection?</cref>
 
 </t>
 <t hangText="'port':">
@@ -761,12 +773,18 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	that the peer has uploaded in the swarm since it sent the "started"
 	event to the tracker. This key is REQUIRED.
 
+<cref>SV - I think we should have here, which peer IDs you uploaded
+      how many kB of packfile to</cref>
+
 </t>
 <t hangText="'downloaded':">
 
 	This is a base ten integer value. It denotes the
 	total amount of bytes that the peer has downloaded in the swarm
 	since it sent the "started" event to the tracker. This key is REQUIRED.
+
+<cref>SV - And here, which peer IDs you received how many kB of
+      packfile from</cref>
 
 </t>
 <t hangText="'completed':">
@@ -776,6 +794,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	Since a peer cannot guarantee that it is a seeder, this value should
 	only be interpreted as an approximation that can help to estimate how
 	many seeders are in the swarm.
+
+<cref>how about - we send the tracker which references we have or are
+      in the process of getting, and how far through them we are.  and
+      only if they haven't been changed last time this "session" (ie,
+      for my peer ID)</cref>
 
 </t>
 <t hangText="'address':">
@@ -801,6 +824,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	tracker. If not present, the tracker uses an implementation
 	defined value.
 
+<cref>SV - this seems a little weird.  why just a number?  Not a
+      number and offset to let you page through all the references?
+      Are you just supposed to keep sending requests with a bigger
+      number until you get them all?  </cref>
+
 </t>
 <t hangText="'event':">
 
@@ -821,16 +849,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	down gracefully. 
 
 </t>
-<t hangText="'FIXME':">
-
-        incomplete.
-
-<cref>we seem to be missing the meat of the protocol here; what do
-      clients say to the tracker?</cref>
-
-</t>
 </list>
 </t>
+
+<cref>SV - How about we also request an update interval, rather than
+          forcing the server to pick a low one.</cref>
+
 </list>
 </section>
 
@@ -859,17 +883,27 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	that a peer should wait between consecutive regular
 	requests, in seconds. This key is REQUIRED.
     
+<cref>SV - here, the server is just notifying us of how long it will
+      store our session information, ie for how long the peer ID it
+      has issued us (and the buffer of information the server is
+      keeping on us, like which references SHA1 objects we have been
+      given, are trying to get, and how far through them we are, etc)
+      are valid.  How about we change this to "expires" or
+      something.</cref>
+
 </t>
 <t hangText="'complete':">
 
-	This is an integer that indicates the number of seeders. This
-	key is OPTIONAL.
+	This is an integer that indicates the total number of seeders
+	of the complete set of references we told the server we were
+	requesting.  This key is OPTIONAL.
 
 </t>
 <t hangText="'incomplete':">
 
-	This is an integer that indicates the number of peers downloading
-	the torrent. This key is OPTIONAL.
+	This is an integer that indicates the number of peers that are
+	downloading (parts of) the set of references we told the
+	server about. This key is OPTIONAL.
 
 </t>
 <t hangText="'peers':">
@@ -879,17 +913,30 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	It has the following structure:
 
+<cref>SV - if we send the tracker a list of current peers, we can get
+           the server to confirm them.  If the THP server MUST list
+           known peers for all of the peers that it was sent, then the
+           client MAY, if it has contacted all of the tracker
+           addresses, drop the connection on un-mentioned
+           peers.</cref>
+
 <list style="hanging">
 <t hangText="'peer id':">
 
 	This is a REQUIRED string value containing the self-designated
 	ID of the peer.
+
+<cref>SV - "server issued"</cref>
       
 </t>
 <t hangText="'address':">
 
 	This is a REQUIRED string value indicating the Internet-wide address of the peer.
 	This may be given as a dotted quad IPv4 format, hexadecimal IPv6 format or DNS name.
+
+<cref>SV - then, say, if the address is empty, this is a blacklist
+           item, recommending dropping connections to said peer.  The
+           THP server has a method for kicking out peers then.</cref>
 
 </t>
 <t hangText="'port':">
