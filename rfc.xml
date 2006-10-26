@@ -583,6 +583,22 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 		wire. Should the peer then repack or not? In the worst
 		case, many objects can be exist that need to be pruned.
 
+	SV - "repacking" is not really a concept to PWP.  The closest
+	     concept is 'splicing' Reels (I'm just loving this tape
+	     thing...).  Any client can choose to eliminate a
+	     redundant references object by replacing a number of
+	     Reels with a single, longer Reel, which starts at the
+	     start point of the first replaced Reel and ends at the
+	     end point.
+
+             So, some clients in the swarm will hold onto the
+	     references object which has the abandoned commits;
+	     without any subsequent references object which fast-
+	     forwards it, it won't be able to make a clean splice.
+	     Then it is (hopefully) up to the user to decide whether
+	     they want to honour the master server dropping revisions
+	     or not.
+
 	</cref>
 
 </t>
