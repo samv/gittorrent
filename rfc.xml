@@ -1006,6 +1006,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 		peers can end up being constantly redirected between
 		trackers.
 
+	SV - perhaps just say that they can just issue a 302 response
+	     to the next tracker, but they should not do it multiple
+	     times for the same client.
+
 	</cref>
 
 </t>
