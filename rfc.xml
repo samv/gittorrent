@@ -822,22 +822,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <t hangText="'trackers':">
 
-	This is a list of string values. Each value is a URL
-	pointing to a tracker.
-
-	<cref>
-
-	SV - What is the significance of multiple trackers?  Should
-	clients join all or just one?
-
-	JF - Suggestion for clarification:
-
-		If multiple trackers are specified, the peer should
-		randomly choose a a tracker, and should continue to do
-		so until it finds a tracker that is operational.  A peer
-		SHOULD only connect to one tracker.
-
-	</cref>
+	This is a list of string values. Each value is a URL pointing
+	to a tracker.  If multiple trackers are listed, the peer
+	SHOULD choose a tracker at random, and if connection fails,
+	proceed through the list.  A peer SHOULD only connect to one
+	tracker at a time.
 
 </t>
 </list>
