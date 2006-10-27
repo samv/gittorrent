@@ -1247,7 +1247,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	The unsigned value of the first byte indicates the length of a
 	character string containing the protocol name. In GTP/0.1 this
-	number is 19. The local peer knows its own protocol name and
+	number is 7. The local peer knows its own protocol name and
 	hence also the length of it. If this length is different than
 	the value of this first byte, then the connection MUST be
 	dropped.
@@ -1259,7 +1259,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	the protocol in ASCII and have the same length as given in the
 	Name Length field. The protocol name is used to
 	identify to the local peer which version of GTP the remote peer
-	uses. In GTP/0.1 the name is 'GitTorrent protocol'. If this
+	uses. In GTP/0.1 the name is 'GTP/0.1'. If this
 	string is different from the local peers own protocol name, then
 	the connection is to be dropped.
 
