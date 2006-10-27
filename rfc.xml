@@ -305,7 +305,7 @@
 </section>
 </section> <!-- ==================================================== -->
 
-<section title="Bencoding ">
+<section title="Bencoding">
 <t>
 
    Bencoding encodes data in a platform independent way.  In GTP/0.1 the
@@ -1851,7 +1851,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Security Consideration" anchor="security-considerations">
 <t>
 
-   This section examines security considerations for GTP/0.1.The
+   This section examines security considerations for GTP/0.1. The
    discussion does not include definitive solutions to the problems
    revealed, though it does make some suggestions for reducing
    security risks.
