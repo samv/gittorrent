@@ -106,19 +106,15 @@
 </t>
 <t>
 
-<cref>SV - IMO, the major benefit may actually come from the ability
-     to set up mirrors and have them replicate automatically... hence
-     the use of "not only mirrors" where "not mirrors" appears in
-     equivalent sections of the BitTorrent specification</cref>
-
    The approach in the GitTorrent Protocol (GTP) is to spread the load
    not only across mirror servers, but across the clients themselves,
    by having them upload objects from the repository to each other
    while downloading it.  Since the clients usually do not utilize
    their upload capacity while fetching a file, this approach does not
    disadvantage the clients. This has the added advantage that even
-   small organizations with limited resources can publish large files
-   on the Internet without having to invest in costly infrastructure.
+   small organizations with limited resources can publish large files,
+   or small changes to large projects, on the Internet without having
+   to invest in costly infrastructure.
 
 </t>
 
@@ -126,18 +122,11 @@
 <section title="Extensions">
 <t>
 
-<cref>SV - this should be reworded to express the true heritage of the
-     protocol, not just cut and pasted from BitTorrent</cref>
-
    The GTP is designed to be extensible to meet the future needs of
    individuals and community forums. It also allows certain optional
-   features that clients may omit in their implementation. The git
-   community has shown that This document o the extent that these
-   extensions have become part of what the GitTorrent community
-   considers best practice they have been included in this document.
-   However, many extensions have been omitted either because they have
-   been deemed to lack interoperability with existing implementations,
-   or because they are not regarded as being sufficiently mature.
+   features that clients may omit in their implementation.  The
+   extensions chosen for the first GTP version are similar to those
+   considered "best practice" by the Bittorrent community.
 
 </t>
 </section>
