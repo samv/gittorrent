@@ -119,6 +119,9 @@
 </t>
 <t>
 
+   The basic architecture of GTP is inspired by the BitTorrent protocol,
+   a mature file distribution protocol. Readers familiar with the
+   BitTorrent protocol will find that GTP has many similar concepts.
    One of the key differences between the GitTorrent Protocol and
    BitTorrent, is that GitTorrent is specifically designed to deal
    with repositories that are added to over time, allowing for
