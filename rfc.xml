@@ -888,18 +888,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	of bytes that the peer has uploaded in the swarm since it sent
 	the "started" event to the tracker. This key is REQUIRED.
 
-<cref>SV - I think we should have here, which peer IDs you uploaded
-      how many kB of packfile and index to</cref>
-
 </t>
 <t hangText="'downloaded':">
 
 	This is a base ten integer value. It denotes the total amount
 	of bytes that the peer has downloaded in the swarm since it
 	sent the "started" event to the tracker. This key is REQUIRED.
-
-<cref>SV - And here, which peer IDs you received how many kB of
-      packfile and index from</cref>
 
 </t>
 <t hangText="'completed':">
@@ -1056,11 +1050,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	port number of the peer. This key is REQUIRED.
 
 </t>
-
-<cref>SV - server could return per-peer "confirmed uploads" or
-           something else based on checking reported uploads to peers
-           with reported downloads from those peers.</cref>
-
 </list>
 </t>
 <t hangText="'references':">
