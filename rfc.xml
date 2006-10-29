@@ -406,51 +406,6 @@
 
 </t>
 <t>
-        The simplest conformant "tracker" is a static file, which is
-	the THP response body.  In this case, peers have no option
-	except to discover new peers through its neighboring peers.
-
-	<cref>
-
-	JF - Comment recommendation on using peer network over tracker
-
-		Does this make it harder for new peers to get
-		connected?  If many peers will choose not to collect
-		peer info via the tracker, could it end up making it
-		harder for new peers to get connected? This also
-		depends on how the tracker serves peers, e.g. whether
-		new peers are prioritized over older peers.
-
-		On the other hand, it does save some tracker
-		bandwidth.  For example, if the peer checks in every
-		15 minutes, would that have been long enough for the
-		peer info to have been spread through the network?
-
-	</cref>
-	<cref>
-
-	JF - [RFC] Tracker Considerations
-
-		Some recommendations:
-
-		- A tracker SHOULD advertise new peers by including
-		  their address in the peer list of responses.
-
-		- A tracker SHOULD try to pair up new peers with peers
-		  who have reported that they have downloaded
-		  something, so new peer do not end up connecting to
-		  other new coming peers.
-
-		NOTE: The RFC is lacking in detailed regarding the
-		tracker, so there should maybe exist a section
-		someplace in the RFC containing recommendations and
-		considerations, for developers creating and system
-		administrators using trackers.
-
-	</cref>
-
-</t>
-<t>
 
 	While downloading, a peer SHOULD continously discover new
 	peers while it is connected to the swarm to find peers that
@@ -833,12 +788,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    The Tracker HTTP Protocol (THP) is a simple mechanism for introducing
-   peers to each other. A tracker is a HTTP service that must be
-   contacted by a peer in order to join a swarm. As such, the tracker
-   constitutes the only centralized element in GTP/0.1. A tracker does
-   not by itself provide access to any downloadable data. A tracker relies on
-   peers sending regular requests. It MAY assume that a peer is dead if it
-   does not make any requests for a long time.
+   peers to each other. A tracker is a HTTP service that is normally
+   contacted by a peer in order to join a swarm.  As such, the tracker
+   constitutes the only centralized element in GTP/0.1.  A tracker does
+   not by itself provide access to any downloadable data.  A tracker
+   records peer advertisements, which expire after a time period
+   negotiated between the peer and the tracker.
 
 </t>
 
@@ -1056,6 +1011,53 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </list>
+</section>
+
+<section title="Tracker Considerations">
+
+<t>
+
+   The simplest conformant "tracker" is a static file, which is the
+   THP response body.  In this case, peers have no option except to
+   discover new peers through its neighboring peers.  In this case,
+   the 'expires' value in the response SHOULD be set to 0.
+
+</t>
+<t>
+
+   A tracker SHOULD advertise new peers by including their address in
+   the peer list of responses.  It SHOULD only advertise it for the
+   amount of time specified by the peer, and return the amount of time
+   that it intends to advertise your address for in the response.
+   This MAY be longer or shorter than the time requested, depending on
+   the implementation of the tracker.
+
+</t>
+<t>
+
+   A tracker MAY return its list of peers randomly, and MAY respond
+   with a different number of peers than was asked for.  A tracker
+   SHOULD prefer to return peers who have reported that they have
+   downloaded something in responses to new peers, to avoid connecting
+   peers that have no data to exchange with each other.  However, they
+   SHOULD return information on all the peers that have requested to
+   be advertised, when repeatedly requested for more peers by
+   individual peers.
+
+</t>
+<t>
+
+   A tracker SHOULD start new peers off with a lower value of
+   'expires' than the maximum configured value, and gradually increase
+   its value as the peer demonstrates its ability to refresh its
+   advertisement with the tracker in a timely fashion.  When
+   configuring the maximum honored advertisement length,
+   administrators will have to weigh up the benefits of less load on
+   the tracker against the performance degradation of occasionally
+   sending new peers to "dud" peers who have reneged on their
+   advertising promises.
+
+</t>
 </section>
 </section> <!-- ==================================================== -->
 
