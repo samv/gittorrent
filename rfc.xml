@@ -872,9 +872,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    GET request must be parametrized as specified in the HTTP
    protocol. The following parameters must be present in the request:
 
-<cref>SV - we might need this to be a POST, if we are to send more
-           information, like references progress</cref>
-
 </t>
 <list style="hanging">
 <t hangText="'repo_hash':">
@@ -888,10 +885,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	This is a REQUIRED string and must contain the 20-byte
 	self-designated ID of the peer.
-
-<cref>SV - why don't we just return these to the sender, as receipts
-      for connection?  Then it can be OPTIONAL - and if specified, the
-      server SHOULD allocate that identifier, if it is free.</cref>
 
 </t>
 <t hangText="'port':">
@@ -931,18 +924,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	approximation that can help to estimate how many seeders are
 	in the swarm.
 
-<cref>SV - how about - we send the tracker which commit-reels we got
-      we have or are in the process of getting (or ones that we made
-      up that we want), and how far through them we are.  and only if
-      their progress hasn't changed last time this "session" (ie, for
-      my peer ID).  and, only in chains of reels ending in references
-      that the server has given us during the lifetime of this peer ID
-      :).
-
-      And if we say that commit-reels must be explicitly canceled,
-      then this doesn't need to overload every request by telling the
-      server all the reels that we have.</cref>
-
 </t>
 <t hangText="'address':">
 
@@ -966,16 +947,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This is an OPTIONAL value. If present, it should hold a base
 	ten integer value indicating the number of references that the
 	local peer wants to receive from the tracker. If not present,
-	the tracker uses an implementation defined value.
-
-<cref>SV - this seems a little weird.  why just a number?  Not a
-      number and offset to let you page through all the references?
-      Are you just supposed to keep sending requests with a bigger
-      number until you get them all?
-
-      Ok, so, say that we are issued a Peer ID.  Then we're saying
-      "give me N more references objects that I didn't know about."
-      </cref>
+	the tracker uses an implementation defined value.  The
+	references objects returned by the tracker MAY be randomly
+	determined.
 
 </t>
 <t hangText="'event':">
@@ -1052,12 +1026,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	in seconds. This key is REQUIRED.
 
 <cref>SV - here, the server is just notifying us of how long it will
-      store our session information, ie for how long the peer ID it
-      has issued us (and the buffer of information the server is
-      keeping on us, like which references SHA1 objects we have been
-      given, are trying to get, and how far through them we are, etc)
-      are valid.  How about we change this to "expires" or
-      something.</cref>
+      keep valid our advertisement to be in the swarm.  How about we
+      change this to "expires" or something.</cref>
 
 </t>
 <t hangText="'complete':">
@@ -1065,27 +1035,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This is an integer that indicates the number of seeders. This
 	key is OPTIONAL.
 
-<cref>SV - if we told the servers which packfiles we are after, then
-           "number of seeders" refers to the number of people who have
-           packfiles ending at all the packfiles we told the tracker
-           we were interested in.  Alternatively, the minimum number
-           of active peers who have complete packfiles ending in (or
-           after) the packfiles we want.  In a sense, we are
-           aggregating a statistic that is really per-pack.</cref>
-
 </t>
 <t hangText="'incomplete':">
 
 	This is an integer that indicates the number of peers
 	downloading the torrent. This key is OPTIONAL.
-
-<cref>SV - again, if we told the servers which packfiles we are after,
-           then "number of incomplete" might refer to a number of
-           things.  Peers might be downloading different sets of
-           packs, if they all chose different references.  Probably
-           the best definition is the same basis that the "complete"
-           was calculated on, but only those people who are still in
-           progress.</cref>
 
 </t>
 <t hangText="'peers':">
@@ -1095,20 +1049,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	It has the following structure:
 
-<cref>SV - if we send the tracker a list of current peers, we can get
-           the server to confirm them.  If the THP server MUST list
-           known peers for all of the peers that it was sent, then the
-           client MAY, if it has recently contacted all of the tracker
-           addresses, drop the connection on un-mentioned
-           peers.</cref>
-
 <list style="hanging">
 <t hangText="'peer id':">
 
 	This is a REQUIRED string value containing the self-designated
 	ID of the peer.
-
-<cref>SV - "server issued"</cref>
 
 </t>
 <t hangText="'address':">
@@ -1116,10 +1061,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	This is a REQUIRED string value indicating the Internet-wide
 	address of the peer.  This may be given as a dotted quad IPv4
 	format, hexadecimal IPv6 format or DNS name.
-
-<cref>SV - then, say, if the address is empty, this is a blacklist
-           item, recommending dropping connections to said peer.  The
-           THP server has a method for kicking out peers then.</cref>
 
 </t>
 <t hangText="'port':">
@@ -1143,9 +1084,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	the wire using the References message.  See <xref
 	target="references" /> for instructions on how to interpret
 	the string.
-
-<cref>SV - This would need added - "that haven't been sent to your
-           peer ID already"</cref>
 
 </t>
 </list>
@@ -1315,12 +1253,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	be dropped.  Also, if any other peer has already identified
 	itself to the local peer using that same peer ID, the
 	connection MUST be dropped.
-
-<cref>SV - this "self-designated name" should have been issued by the
-           tracker, but of course the peer is a free thinking
-           implementation and therefore can make its own mind up
-           whether or not to play the way that the tracker
-           recommends.</cref>
 
 </t>
 </list>
