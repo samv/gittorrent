@@ -1059,7 +1059,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    administrators will have to weigh up the benefits of less load on
    the tracker against the performance degradation of occasionally
    sending new peers to "dud" peers who have reneged on their
-   advertising promises.
+   advertising promises.  Similarly, unless peers have been
+   specifically configured otherwise, they SHOULD be reserved about
+   the intentions of their users when it comes to choosing
+   advertisement time lengths.
 
 </t>
 </section>
@@ -1262,7 +1265,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 	These messages handle the requesting and sending of data
 	portions. The following messages fall into this category:
-	Scan, Request, Play, and Cancel.
+	Scan, Request, Play, and Stop.
 
 </t>
 </list>
@@ -1645,7 +1648,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	into the block that the first object starts.  If the "Block
 	Length" is zero, the pack is a response to the auxiliary
 	"Request" method above, and the "Reel SHA1 Pair" arbitrarily
-	set to values that may be used for the "Cancel" message.  If
+	set to values that may be used for the "Stop" message.  If
 	the "Offset" and "Pack" fields are not present, it is a
 	request for the specified block.  The generated pack may use
 	as a delta base any object prior to it in the commit-reel, or
@@ -1659,7 +1662,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section title="Cancel">
+<section title="Stop">
 <t>
 
 	This message has ID 11 and a payload of length 48. The payload
@@ -1686,7 +1689,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
    Towards the end of a download session, it may speed up the download
    to send request messages for the remaining objects to more than one
-   neighboring peers. A client must issue cancel messages to all pending
+   neighboring peers. A client must issue stop messages to all pending
    requests sent to neighboring peers as soon as an object is downloaded
    successfully. This is referred to as the end game.
 
