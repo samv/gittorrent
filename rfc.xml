@@ -69,11 +69,10 @@
    downloading a repository. The GTP approach capitalizes on this fact
    by having clients upload bits of the repository data to each
    other. In comparison to the original client-server distribution,
-   this adds huge scalability and cost-management advantages.
-
-<cref>SV - also, mirrors are automatically used as soon as they are
-      added, instead of requiring mirror administrators to configure
-      and advertise them</cref>
+   this adds huge scalability and cost-management advantages.  People
+   can set up "mirrors" of torrents, and have them advertised with
+   less administration and more convenience the the user than setting
+   up a regular mirror.
 
 </t>
 </abstract>
