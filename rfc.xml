@@ -230,6 +230,12 @@
 	repository references, i.e. branches and tags.
 
 </t>
+<t hangText="Object ID:">
+
+	All git objects are uniquely identified by a SHA1 value,
+        derived from digesting the object type, length and content.
+
+</t>
 </list>
 </section>
 
@@ -633,13 +639,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="Objects">
 <t>
 
-    An object is a single git object.  All objects are uniquely
-    identified by a SHA1, derived from the object content, type and
-    length.  Peers can exchange information about what objects they
+    An object is a single git object, like a commit, tree, blob or
+    tag.  Peers can exchange information about what new objects they
     have by requesting the list of references a neighboring peer makes
     available, and checking for unknown object IDs in the list.
-
-<cref>SV - should move object ID into the glossary</cref>
 
 </t>
 </section>
