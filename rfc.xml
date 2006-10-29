@@ -128,19 +128,20 @@
 
 </t>
 
-<!--
-<section title="Extensions">
+<section title="Compatibility and Extensions">
 <t>
 
-   The GTP is designed to be extensible to meet the future needs of
-   individuals and community forums. It also allows certain optional
-   features that clients may omit in their implementation.  The
-   extensions chosen for the first GTP version are similar to those
-   considered "best practice" by the Bittorrent community.
+   The GTP/0.1 should be considered experimental protocol.  Future
+   versions of GTP may add new optional features to the protocol. As a
+   result, clients with differing version and feature set can exist.
+   Peers should be designed to be compatible with peers implementing a
+   different version of GTP and not rely on a specific feature set
+   being implemented by another peer. The extensions chosen for the
+   first GTP version are similar to those considered "best practice"
+   by the Bittorrent community.
 
 </t>
 </section>
--->
 
 <section title="Audience">
 <t>
@@ -1165,9 +1166,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	The unsigned value of the first byte indicates the length of a
 	character string containing the protocol name. In GTP/0.1 this
 	number is 7. The local peer knows its own protocol name and
-	hence also the length of it. If this length is different than
-	the value of this first byte, then the connection MUST be
-	dropped.
+	hence also the length of it.
 
 </t>
 <t hangText="Protocol Name:">
@@ -1176,9 +1175,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	of the protocol in ASCII and have the same length as given in
 	the Name Length field. The protocol name is used to identify
 	to the local peer which version of GTP the remote peer
-	uses. In GTP/0.1 the name is 'GTP/0.1'. If this string is
-	different from the local peers own protocol name, then the
-	connection is to be dropped.
+	uses. In GTP/0.1 the name is 'GTP/0.1'.
 
 </t>
 <t hangText="Extension Flags:">
