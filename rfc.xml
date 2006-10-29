@@ -1444,14 +1444,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <section title="References">
 <t>
 
-	This message has ID 5 and a variable payload. To request
+	This message has ID 5 and a variable payload.  To request
 	references from the remote peer, a peer can send this message
-	with no payload. To announce to the other peer that it has a
-	new reference object available it can send this message with a
-	reference SHA1 and an empty reference object. A peer MUST NOT
-	send its current reference object unless it has been requested
-	by the remote peer using this method.  This reduces the impact
-	of new reference object flooding the network.
+	with no payload.  To announce to the other peer that it has a
+	reference object available it can send this message with a
+	reference SHA1 and an empty reference object.  A peer MUST NOT
+	send its current reference objects unless they have been
+	requested by the remote peer using this method.  This reduces
+	the impact of new reference objects flooding the network.
 
 </t>
 <t>
@@ -1471,12 +1471,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 | Reference SHA1 | References Length | References Object | ... |
 ----------------------------------------------------------------</artwork>
 </figure>
+<t>
 
-<cref>OK.  Here's one of the first changes: we send a _list_ of
-      references that we are currently dealing with.  The idea being
-      that each one defines the boundary of a commit-reel; either the
-      beginning, or the end.
-</cref>
+        Peers MUST send only references objects which the other end
+        has not already announced to them.  Peers MUST only advertise
+        references objects once during the lifetime of a PWP
+        connection.
+
+</t>
 </section>
 <section title="Reels">
 <t>
