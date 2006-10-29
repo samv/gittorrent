@@ -1145,11 +1145,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    Any remote peer wishing to communicate with the local peer must
-   open a TCP connection to this port and perform a handshake
-   operation. The handshake operation MUST be carried out before any
-   other data is sent from the remote peer. The local peer MUST NOT
-   send any data back to the remote peer before a well constructed
-   handshake has been recognized according to the rules below. If the
+   open a TCP connection to this port and send a handshake
+   message. A handshake message MUST be received before any
+   other messages are sent to the remote peer. If the
    handshake in any way violates these rules the local peer MUST close
    the connection with the remote peer.
 
@@ -1234,8 +1232,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
    In GTP/0.1 the handshake has a total of 68 bytes.
-
-<cref>SV - what is the handshake response?  Another similar message?</cref>
 
 </t>
 </section>
