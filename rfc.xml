@@ -117,6 +117,16 @@
    to invest in costly infrastructure.
 
 </t>
+<t>
+
+   One of the key differences between the GitTorrent Protocol and
+   BitTorrent, is that GitTorrent is specifically designed to deal
+   with repositories that are added to over time, allowing for
+   continual updates.  Another difference is that while BitTorrent
+   synchronises "flat" files, GitTorrent synchronises a tree of
+   objects which can grow in any direction.
+
+</t>
 
 <!--
 <section title="Extensions">
@@ -459,21 +469,13 @@
 	contacting the tracker at the minimum negotiated frequency.
 	If it receives a suitably authorized reference update via PWP
 	or THP, it MUST no longer consider itself a Seeder, and start
-	fetching the new content.  This is one key difference to the
-	BitTorrent protocol, in which individual torrents do not
-	update.  Seeders MAY check with the tracker more frequently to
+	fetching the new content.  Seeders MAY check with the tracker more frequently to
 	determine whether new updates have been received, but this is
 	not necessary - as once the first peer gets the reference,
 	that peer will start attempting to transfer the new reference
 	list and objects to its peers that used to be considered
 	Seeders.
 
-	<cref>
-
-		JF: The BitTorrent reference should probably go to the
-		intro
-
-	</cref>
 	<cref>
 
 		JF: This section is not so much about discovering
