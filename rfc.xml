@@ -394,6 +394,12 @@
 	to discover peers through its neighboring peers to reduce
 	resource demands on the tracker.
 
+</t>
+<t>
+        The simplest conformant "tracker" is a static file, which is
+	the THP response body.  In this case, peers have no option
+	except to discover new peers through its neighboring peers.
+
 	<cref>
 
 	JF - Comment recommendation on using peer network over tracker
@@ -430,22 +436,6 @@
 		someplace in the RFC containing recommendations and
 		considerations, for developers creating and system
 		administrators using trackers.
-
-	</cref>
-	<cref>
-
-	JF - [RFC] Static "tracker" service
-
-		It is an alternative method for allowing new peers to
-		join the network, for gittorrent networks that do not
-		have a dynamic tracker where peers can sign in. For
-		scalability this could also be placed in a DHT.
-
-		Optionally, the metainfo file can contain URLs to
-		statically served files containing a list of peers. A
-		peer in the network can periodically update it.  A
-		problem with this method is that new peers do not get
-		"advertised" by the tracker.
 
 	</cref>
 
@@ -1007,7 +997,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	advertised for.  A peer SHOULD send another THP request to the
 	tracker before this amount of time elapses.  It is recommended
 	to wait at least half of this time before contacting the
-	tracker again.  This key is REQUIRED.
+	tracker again.  If this value is 0, it means that the tracker
+	is not avertising your IP address - for instance, it is a
+	"static tracker".  This key is REQUIRED.
 
 </t>
 <t hangText="'complete':">
