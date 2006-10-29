@@ -809,31 +809,18 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	target="references" /> for instructions on how to handle
 	reference objects.
 
-	<cref>
+</t>
+<t>
 
-	SV - What is the significance of this one here?
-
-	JF - Clarification of the list of reference in the metainfo file
-
-		Maybe it should be removed because it makes the
-		metainfo file more "volatile", however, it makes it
-		possible for a client to list which branches (and
-		tags) a repository contains. I believe it is best to
-		choose "usability" here and simply state the
-		following:
-
-		Repository references obtained through reference
-		objects from a metainfo file may be out of date,
-		either with regard to the listed SHA1 or because a new
-		branch or tags has been added. After successfully
-		joining a swarm, a peer SHOULD request new reference
-		object from its neighboring peers to update its
-		repository references.  The primary reason for listing
-		reference objects in the metainfo file is to allow
-		peers to present a list of references for the user
-		before begining downloading the repository.
-
-	</cref>
+	Repository references obtained through reference objects from
+	a metainfo file may be out of date, either with regard to the
+	listed SHA1 or because a new branch or tags has been added.
+	After successfully joining a swarm, a peer SHOULD request new
+	reference object from its neighboring peers to update its
+	repository references.  The primary reason for listing
+	reference objects in the metainfo file is to allow peers to
+	present a list of references for the user before beginning
+	downloading the repository.
 
 </t>
 <t hangText="'trackers':">
