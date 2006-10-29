@@ -150,7 +150,7 @@
    It is assumed that developers are familiar with the git version
    control system, more specifically the layout of the repository and
    the design of the object store. This includes the concepts of the
-   commit and general object tree, "shallow" pack files and how to
+   commit and general object tree, "thin" pack files and how to
    validate signed tag objects.
 
 </t>
@@ -628,7 +628,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    are sorted in a defined way and then logically divided into roughly
    even "blocks" by uncompressed size, dividing only on object
    boundaries.  The blocks are a logical concept only; responses are
-   "shallow" git pack files, which SHOULD be delta compressed against
+   "thin" git pack files, which SHOULD be delta compressed against
    objects preceding them in the commit reel or any other object
    reachable from the starting reference list.  The results MUST also
    be gzip compressed, conformant to the requirements of the git pack
@@ -706,7 +706,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 <t>
 
     To keep the protocol simple, only complete objects are send in
-    messages, into "shallow" pack files.  In optimal operation, these
+    messages, into "thin" pack files.  In optimal operation, these
     are the only parts that will be transferred.  Objects are
     considered to be "in" a block if they start within the block. This
     implies that if single objects span several block boundaries, that
