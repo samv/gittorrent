@@ -954,12 +954,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </list>
 </t>
+<t hangText="'valid':">
 
-<cref>SV - How about we also request an update interval, rather than
-          forcing the server to pick a low one.  It's really telling
-          the server how long we intend to listen on the port
-          for.</cref>
+        This parameter is OPTIONAL, and specifies the amount of time
+        that our peer address should be advertised, in seconds.  If
+        not specified, the tracker may assume it to be an
+        implementation-defined value.
 
+</t>
 </list>
 </section>
 
@@ -981,9 +983,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 		that peers can end up being constantly redirected
 		between trackers.
 
-	SV - perhaps just say that they can just issue a 302 response
+	SV - perhaps just say that they can just issue a 307 response
 	     to the next tracker, but they should not do it multiple
-	     times for the same client.
+	     times for the same client.  A 503 response could also
+	     indicate "back off".
 
 	</cref>
 
@@ -998,17 +1001,13 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	for failure.
 
 </t>
-<t hangText="'interval':">
+<t hangText="'expires':">
 
-	A peer MUST send regular HTTP GET requests to the tracker to
-	obtain an updated list of peers and update the tracker of its
-	status. The value of this key indicated the amount of time
-	that a peer should wait between consecutive regular requests,
-	in seconds. This key is REQUIRED.
-
-<cref>SV - here, the server is just notifying us of how long it will
-      keep valid our advertisement to be in the swarm.  How about we
-      change this to "expires" or something.</cref>
+        This is a value, in seconds, that your address will be
+	advertised for.  A peer SHOULD send another THP request to the
+	tracker before this amount of time elapses.  It is recommended
+	to wait at least half of this time before contacting the
+	tracker again.  This key is REQUIRED.
 
 </t>
 <t hangText="'complete':">
