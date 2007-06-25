@@ -1230,7 +1230,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </list>
 <t>
 
-   In GTP/0.1 the handshake has a total of 68 bytes.
+   In GTP/0.1 the handshake has a total of 56 bytes.
 
 </t>
 </section>
