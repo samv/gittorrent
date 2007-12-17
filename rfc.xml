@@ -1441,7 +1441,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section title="References">
+<section title="References" anchor="peer-state-references">
 <t>
 
 	This message has ID 5 and a variable payload.  To request
