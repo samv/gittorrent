@@ -1541,9 +1541,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
------------------------------------------------------------------
-| Reel SHA-1 Pair | Block offset | Block length | Size | Bitmap |
------------------------------------------------------------------</artwork>
+--------------------------------------------------------------
+| Reel SHA1 Pair | Block offset | Block size | Size | Bitmap |
+--------------------------------------------------------------</artwork>
 </figure>
 </t>
 </section>
@@ -1565,9 +1565,9 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <figure>
 <artwork>
---------------------------------------------------------------
-| Reel SHA-1 Pair | Block offset | Block Length | Index Data |
---------------------------------------------------------------</artwork>
+-------------------------------------------------------------
+| Reel SHA1 Pair | Block offset | Block Length | Index Data |
+-------------------------------------------------------------</artwork>
 </figure>
 </t>
 <t>
