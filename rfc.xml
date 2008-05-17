@@ -652,7 +652,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 <figure>
 <artwork>
-        reel_offset = block_number % fixed_block_size</artwork>
+        reel_offset = block_number * fixed_block_size</artwork>
 </figure>
 <t>
 
