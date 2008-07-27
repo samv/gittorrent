@@ -81,7 +81,7 @@
 
 <middle> <!-- ================================================ -->
 
-<section title="Introduction">
+<section anchor="intro" title="Introduction">
 <t>
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -131,7 +131,7 @@
 
 </t>
 
-<section title="Compatibility and Extensions">
+<section anchor="compat" title="Compatibility and Extensions">
 <t>
 
    The GTP/0.1 should be considered experimental protocol.  Future
@@ -146,7 +146,7 @@
 </t>
 </section>
 
-<section title="Audience">
+<section anchor="audience" title="Audience">
 <t>
 
    This document is aimed at developers who wish to implement GTP for
@@ -170,7 +170,7 @@
 </t>
 </section>
 
-<section title="Terminology">
+<section anchor="terms" title="Terminology">
 <list style='hanging'>
 
 <t hangText="Peer:">
@@ -253,7 +253,7 @@
 </list>
 </section>
 
-<section title="Overall Operation">
+<section anchor="overview" title="Overall Operation">
 <t>
 
    GTP consists of two logically distinct protocols, namely the
@@ -318,7 +318,7 @@
 </section>
 </section> <!-- ==================================================== -->
 
-<section title="Bencoding">
+<section anchor="bencode" title="Bencoding">
 <t>
 
    Bencoding encodes data in a platform independent way.  In GTP/0.1
@@ -348,7 +348,7 @@
    </artwork>
 </figure>
 
-<section title="Scalar Types">
+<section anchor="bencode-scalar" title="Scalar Types">
 <t>
 
    Integers are encoded by prefixing a string containing the base ten
@@ -367,7 +367,7 @@
 </t>
 </section>
 
-<section title="Compound Types">
+<section anchor="bencode-compound" title="Compound Types">
 <t>
 
    The compound types provides a mean to structure elements of any
@@ -556,7 +556,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Objects, Commit-Reels and Blocks">
+<section anchor="organization" title="Objects, Commit-Reels and Blocks">
 <t>
 
    This section describes how a torrent is organized in objects,
@@ -587,7 +587,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    structure of the pack files in the underlying git repository.
 </t>
 
-<section title="Objects">
+<section anchor="org-objects" title="Objects">
 <t>
 
     An object is a single git object, like a commit, tree, blob or
@@ -598,7 +598,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Commit-Reels">
+<section anchor="org-reels" title="Commit-Reels">
 <t>
 
     A commit reel is defined as a deterministically sorted
@@ -627,7 +627,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </section>
 
-<section title="Blocks">
+<section anchor="org-blocks" title="Blocks">
 <t>
 
     The size of a block is an implementation defined value that is not
@@ -672,7 +672,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section> <!-- ==================================================== -->
 
-<section title="The Metainfo File">
+<section anchor="metainfo" title="The Metainfo File">
 <t>
 
    The metainfo file provides the client with information on the
@@ -695,7 +695,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 
-<section title="The Structure of the Metainfo File">
+<section anchor="metainfo-struct" title="The Structure of the Metainfo File">
 <t>
 
    The metainfo file contains a bencoded dictionary where a key is
@@ -788,7 +788,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section> <!-- ==================================================== -->
 
-<section title="The Tracker HTTP Protocol">
+<section anchor="thp" title="The Tracker HTTP Protocol">
 <t>
 
    The Tracker HTTP Protocol (THP) is a simple mechanism for introducing
@@ -801,7 +801,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 
-<section title="Request">
+<section anchor="thp-request" title="Request">
 <t>
 
    To contact the tracker a peer MUST send a standard HTTP GET request
@@ -916,7 +916,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </list>
 </section>
 
-<section title="Response">
+<section anchor="thp-response" title="Response">
 <t>
 
    Upon receiving the HTTP GET request, the tracker MUST respond with
@@ -1017,7 +1017,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </list>
 </section>
 
-<section title="Tracker Considerations">
+<section anchor="thp-advice" title="Tracker Considerations">
 
 <t>
 
@@ -1068,7 +1068,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section> <!-- ==================================================== -->
 
-<section title="The Peer Wire Protocol">
+<section anchor="pwp" title="The Peer Wire Protocol">
 <t>
 
    The aim of the PWP, is to facilitate communication between
@@ -1135,7 +1135,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </list>
 </section>
 
-<section title="Handshaking">
+<section anchor="pwp-handshake" title="Handshaking">
 <t>
 
    The local peer opens a port on which to listen for incoming
@@ -1235,7 +1235,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Message Communication">
+<section anchor="pwp-comms" title="Message Communication">
 <t>
 
    Following the PWP handshake both ends of the TCP channel may send
@@ -1269,7 +1269,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </list>
-<section title="Peer States">
+<section anchor="pwp-peerstates" title="Peer States">
 <t>
 
    For each end of a connection, a peer must maintain the following two
@@ -1314,7 +1314,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 </section>
-<section title="Peer Wire Messages">
+<section anchor="pwp-messages" title="Peer Wire Messages">
 <t>
 
    All integer members in PWP messages are encoded as a 4-byte
@@ -1385,8 +1385,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="State-oriented Messages">
-<section title="Choke">
+<section anchor="pwp-state" title="State-oriented Messages">
+<section anchor="pwp-choke" title="Choke">
 <t>
 
 	This message has ID 0 and no payload. A peer sends this
@@ -1394,7 +1394,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	being choked.
 </t>
 </section>
-<section title="Unchoke">
+<section anchor="pwp-unchoke" title="Unchoke">
 <t>
 
 	This message has ID 1 and no payload. A peer sends this message
@@ -1403,7 +1403,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Interested">
+<section anchor="pwp-interested" title="Interested">
 <t>
 
 	This message has ID 2 and no payload. A peer sends this message
@@ -1412,7 +1412,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Uninterested">
+<section anchor="pwp-uninterested" title="Uninterested">
 <t>
 
 	This message has ID 3 and no payload. A peer sends this message
@@ -1421,7 +1421,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Peers">
+<section anchor="pwp-peers" title="Peers">
 <t>
 
 	This message has ID 4 and a variable payload length. The
@@ -1441,7 +1441,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section title="References" anchor="peer-state-references">
+<section anchor="pwp-references" title="References" anchor="peer-state-references">
 <t>
 
 	This message has ID 5 and a variable payload.  To request
@@ -1480,7 +1480,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Reels">
+<section anchor="pwp-reels" title="Reels">
 <t>
 
 	This message has ID 6 and a variable payload length. The
@@ -1513,7 +1513,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section title="Blocks">
+<section anchor="pwp-blocks" title="Blocks">
 <t>
 
 	This message has ID 7 and a variable payload length. The
@@ -1549,8 +1549,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section>
 
-<section title="Data-oriented Messages">
-<section title="Scan">
+<section anchor="pwp-data" title="Data-oriented Messages">
+<section anchor="pwp-scan" title="Scan">
 <t>
 
 	This message has ID 8 and a variable payload.  The payload
@@ -1606,7 +1606,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Request">
+<section anchor="pwp-request" title="Request">
 <t>
 
 	This message has ID 9 and a variable length payload. The
@@ -1640,7 +1640,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 </section>
-<section title="Play">
+<section anchor="pwp-play" title="Play">
 <t>
 
 	This message has ID 10 and a variable length payload. The
@@ -1664,7 +1664,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section title="Stop">
+<section anchor="pwp-stop" title="Stop">
 <t>
 
 	This message has ID 11 and a payload of length 48. The payload
@@ -1686,7 +1686,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section>
 
-<section title="The End Game">
+<section anchor="pwp-endgame" title="The End Game">
 <t>
 
    Towards the end of a download session, it may speed up the download
@@ -1706,7 +1706,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Object Selection Strategy">
+<section anchor="pwp-object-strategy" title="Object Selection Strategy">
 <t>
 
    GTP/0.1 does not force a particular order for selecting which
@@ -1778,7 +1778,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 </t>
 
-<section title="Tracker HTTP Protocol Issues">
+<section anchor="sec-thp" title="Tracker HTTP Protocol Issues">
 <t>
 
    The use of the HTTP protocol for communication between the tracker
@@ -1789,7 +1789,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Denial of Service Attacks on Trackers">
+<section anchor="sec-thp-dos" title="Denial of Service Attacks on Trackers">
 <t>
 
    The nature of the tracker is to serve many clients. By mounting a
@@ -1802,7 +1802,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Peer Identity Issues">
+<section anchor="sec-id" title="Peer Identity Issues">
 <t>
 
    There is no strong authentication of clients when they contact the
@@ -1819,7 +1819,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="DNS Spoofing">
+<section anchor="sec-dns" title="DNS Spoofing">
 <t>
 
    Clients using GTP/0.1 rely heavily on the Domain Name Service,
@@ -1851,7 +1851,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Issues with File and Directory Names">
+<section anchor="sec-filenames" title="Issues with File and Directory Names">
 <t>
 
    The reference object provides a way to suggest a name of the
@@ -1896,7 +1896,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Validating the Integrity of Data Exchanged Between Peers">
+<section anchor="sec-integrity" title="Validating the Integrity of Data Exchanged Between Peers">
 <t>
 
    By default, all content served to the client from other peers
@@ -1918,7 +1918,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </t>
 </section>
 
-<section title="Transfer of Sensitive Information">
+<section anchor="sec-sensitive" title="Transfer of Sensitive Information">
 <t>
 
    Some clients include information about themselves when generating
