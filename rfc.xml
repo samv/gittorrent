@@ -1523,7 +1523,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	one is a notification (or a response to a query).  The block
 	offset and size are 32-bit integers.  The block offset must be
 	multiplied by the block size to arrive at the virtual location
-	within the commit-reel.
+	within the commit-reel.  If the Size is set on the request,
+	then the response should not contain more than that many bits.
 
 </t>
 <t>
