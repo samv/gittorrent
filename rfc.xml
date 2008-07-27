@@ -415,7 +415,7 @@
 	peers while it is connected to the swarm to find peers that
 	provide better download rates than its current neightboring
 	peers.  Peer rating and selection are discussed in <xref
-	target="peer-selection-strategy" />.  Periodically connecting
+	target="peer-wire-guidelines" />.  Periodically connecting
 	to new peers will also help ensure that reference updates are
 	distributed throughout the swarm faster.
 
@@ -1083,56 +1083,141 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 
 <section title="Peer Wire Guidelines" anchor="peer-wire-guidelines">
 <t>
-
    PWP does not specify a standard algorithm for selecting the
    neighboring peers with which to share objects, although the
-   following guidelines are expected to be observed by any such
-   algorithm:
-
-</t>
-<list style="symbols">
-<t>
-
-	  The algorithm should not be constructed with the goal in
-	  mind to unnecessarily reduce the amount of data uploaded to
-	  peers as compared to that downloaded.  A peer should
-	  endeavour to complete as many successful uploads to other
-	  peers as possible during its participation in the swarm, to
-	  the limit of its resource constraints.
-
-<cref>SV - I think this is a bit silly.  People might be on asymmetric
-           connections, they might be being charged per megabyte, etc.
-</cref>
-
+   guidelines in this section should result in an overall more
+   effective swarm.
 </t>
 <t>
-
-	  The algorithm should not use a strict tit-for-tat scheme
-	  when dealing with remote peers that have just joined the
-	  swarm and thus have no objects to offer.
-
+   An important consideration to get the most out of the protocol is
+   to avoid the "Scan" and "Request" messages where possible; they
+   involve transferring unnecessary data (Scan) and do not make best
+   use of delta compression (Request).  A perfect session should be
+   possible using only "Play" and "Blocks".
 </t>
 <t>
-
-	  The algorithm should make good use of both download and
-	  upload bandwidth by putting a cap on the number of
-	  simultaneous connections that actively send or receive
-	  data. By reducing the number of active connections, TCP
-	  congestion can be avoided.
-
+   Considerations not mentioned on this section may also come into
+   play; for instance, if a node is found to respond quickly to
+   messages in the explorative phase, then it may help to score more
+   highly paths that include that node.  This protocol is designed to
+   replace the global network of software mirrors; and for those it is
+   commonplace to prefer a single nearby mirror.  It is reasonable to
+   assume that GitTorrent users may request node selection in this
+   way.
+</t>
+<section anchor="pwp-guide-explore" title="Explorative Phase">
+<t>
+   The first thing that a peer does is look for other peers that have
+   useful data.
 </t>
 <t>
-         The algorithm should pipeline data requests in order to
-         saturate active connections.
+   The tracker may have given enough peers to start with, but the
+   "Peers" message (<xref target="pwp-peers" />) may also be used at
+   the beginning to expand this net, especially if only a small number
+   of peers can be reached.
 </t>
 <t>
-
-	  The algorithm should be able to cooperate with peers that
-	  implement a different algorithm.
-
+   Each of the peers should be asked for which commit reels they are
+   tracking via the "Reels" message (<xref target="pwp-reels" />).  If
+   there are any unknown references SHA1s given, then it should ask
+   the peer for those references objects using the "References"
+   message (<xref target="pwp-references" />).  The peer would then
+   sort these references in date order and decide which one is the
+   latest (or, in some cases, user-selected).
 </t>
-
-</list>
+<t>
+   Then, starting from the beginning of history, it has to try to find
+   a set of paths of connecting reels which lead to the latest
+   references.  There may be multiple possible paths, especially if
+   there are many peers available.  A preference should be made for
+   paths which contains large reels which are shared among many
+   visible peers.
+</t>
+</section>
+<section anchor="pwp-guide-eval" title="Path Evaluation">
+<t>
+   Once a valid path has been established, the peer would send out
+   "Blocks" messages (<xref target="pwp-blocks" />) to each of the
+   peers with which it is connected - one for each of the reels
+   included in the paths it is evaluating.  The block size chosen
+   should be initially have a mantissa in base 2 expressable in 2-3
+   digits (eg, a power of 2) and be chosen such that the complete
+   returned "Blocks" message fits into a typical MTU (eg, 1500 bytes).
+</t>
+<t>
+   This can be used to determine how many "effective copies" each of
+   the paths has in the swarm.  In general, a peer would exclude paths
+   which fell below a critical level of effective copies.
+</t>
+<t>
+   By this time, the peer may have received a "Choke" message
+   (<xref target="pwp-choke" />) from the peer to which it has
+   connected.  Paths may also be initially excluded if there are no
+   peers which are able to service them.
+</t>
+</section>
+<section anchor="pwp-guide-download" title="Download Phase">
+<t>
+   Once a path has been decided, blocks can be downloaded.  All of the
+   peers in the swarm which are downloading a common set of reels are
+   sent an "Interested" message, and those that are not are sent an
+   "Uninterested" message.
+</t>
+<t>
+   Downloading in rarest-first order can lessen the wait time for
+   objects.  This is achieved by scaling all of the received "Blocks"
+   bitmaps to the same block size, then producing an array of
+   integers.  For this stage, accuracy of scaling is not important.
+   Blocks should be selected for download randomly, with a bias
+   towards those blocks held by the lowest number of peers.
+</t>
+<t>
+   The connections which are not currently in the "choked" state are
+   picked off, and any number of blocks may be requested, one by one,
+   via the "Play" message (<xref target="pwp-play" />).  No matter
+   what the block size being used by a peer, it is likely to be able
+   to return blocks in the size you are working with.  If not, it
+   should hang up.
+</t>
+<t>
+   If there are only a small number of peers in the swarm, it may pay
+   to start with the earliest blocks in the reel, rather than being
+   random.  This will facilitate returning to this mode later.  In
+   this state, the peer should be more actively checking for more
+   peers, so that it can be sure that it is on the right path.
+</t>
+</section>
+<section anchor="pwp-guide-change" title="Changing paths">
+<t>
+   As the connected state of the swarm changes over time, new
+   information may come to light that call into question the original
+   decisions made.  For instance, there may be no peers which are able
+   to return blocks for the requested reels, or perhaps the download
+   rate is too low.  The new challenge becomes how to speed up
+   downloading the new reels most effectively using the reel fragments
+   already downloaded.
+</t>
+<t>
+   The peer switches to a degraded state - it first needs to stocktake
+   all of the packs it has already received.  It goes about requesting
+   blocks on the new reel.  For each block, instead of requesting it
+   straight away with a "Play" message, it should send a "Scan"
+   message (<xref target="pwp-scan" />), and check to see whether any
+   of the objects in the block are already locally held.  Depending on
+   the relative number of objects already held locally, it might make
+   more sense to issue a "Request" message (<xref target="pwp-request"
+   />) to fill the gaps.
+</t>
+<t>
+   At some point, the decision is made that the overhead of the "Scan"
+   messages is unlikely to pay off, and the regular download mode is
+   returned to.  This decision may be made by checking off all of the
+   loose objects' position in the new reel, or using a gross estimate.
+   The first method is likely to be appropriate if download commenced
+   from the beginning of the initial reel, as described in the
+   previous section.
+</t>
+</section>
 </section>
 
 <section anchor="pwp-handshake" title="Handshaking">
@@ -1441,7 +1526,7 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 </t>
 </section>
-<section anchor="pwp-references" title="References" anchor="peer-state-references">
+<section anchor="pwp-references" title="References">
 <t>
 
 	This message has ID 5 and a variable payload.  To request
@@ -1693,66 +1778,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section>
 
-<section anchor="pwp-object-strategy" title="Object Selection Strategy">
-<t>
-
-   GTP/0.1 does not force a particular order for selecting which
-   objects to download. However, downloading in rarest-first order can
-   lessen the wait time for objects. To find the rarest objects a
-   client must calculate for each git commit object the number of
-   times this commit is available from all its neighboring peers. The
-   objects pointed to by the git commit object with the lowest sum is
-   then selected for requesting.
-
-</t>
-</section>
-
-<section anchor="peer-selection-strategy" title="Peer Selection Strategy">
-<t>
-
-   This section describes the choking algorithm recommended for
-   selecting neighboring peers with whom to exchange objects.
-   Implementations are free to implement any strategy as long as the
-   guidelines in <xref target="peer-wire-guidelines" /> are observed.
-</t>
-<t>
-
-   After the initial handshake both ends of a connection set the
-   Choked flag to true and the Interested flag to false.
-
-</t>
-<t>
-   All connections are periodically rated in terms of their ability to
-   provide the client with a better download rate.  The rating may
-   take into account factors such as the remote peers willingness to
-   maintain an unchoked connection with the client over a certain
-   period of time, the remote peers upload rate to the client and
-   other implementation defined criteria.
-</t>
-
-<t>
- The peers are sorted according to their rating with regard to the
-   above mentioned scheme. Assume only 5 peers are allowed to download
-   at the same time. The peer selection algorithm will now unchoke as
-   many of the best rated peers as necessary so that exactly 5 of
-   these are interested. If one of the top rated peers at a later
-   stage becomes interested, then the peer selection algorithm will
-   choke the the worst unchoked peer. Notice that the worst unchoked
-   peer is always interested.
-
-</t>
-<t>
-
-   The only lacking element from the above algorithm is the capability
-   to ensure that new peers can have a fair chance of downloading a
-   object, even though they would evaluate poorly in the above scheme.
-   A simple method is to make sure that a random peer is selected
-   periodically regardless of how it evaluates. Since this process is
-   repeated in a round robin manner, it ensures that ultimately even
-   new peers will have a chance of being unchoked.
-
-</t>
-</section>
 </section> <!-- ==================================================== -->
 
 <section title="Security Consideration" anchor="security-considerations">
