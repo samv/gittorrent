@@ -1693,26 +1693,6 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </section>
 </section>
 
-<section anchor="pwp-endgame" title="The End Game">
-<t>
-
-   Towards the end of a download session, it may speed up the download
-   to send request messages for the remaining objects to more than one
-   neighboring peers. A client must issue stop messages to all pending
-   requests sent to neighboring peers as soon as an object is downloaded
-   successfully. This is referred to as the end game.
-
-</t>
-<t>
-
-   A client usually sends requests for blocks in stages; sending
-   requests for newer blocks as replies for earlier requests are
-   received. The client enters the end game, when all remaining
-   objects have been requested.
-
-</t>
-</section>
-
 <section anchor="pwp-object-strategy" title="Object Selection Strategy">
 <t>
 
