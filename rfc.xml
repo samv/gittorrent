@@ -1547,6 +1547,12 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 --------------------------------------------------------------</artwork>
 </figure>
 </t>
+<t>
+	To allow for simplicity of implementation, the answer to this
+	message does not have to be in terms of the requested block
+	size.  However, the data returned SHOULD cover the requested
+	portion of the commit reel.
+</t>
 </section>
 </section>
 
