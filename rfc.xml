@@ -577,10 +577,10 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
    When distributing data over PWP, peers request all the new objects
    between two reference lists as a "commit reel".  The new objects
    are sorted in a defined way and then logically divided into roughly
-   even "blocks" by uncompressed size, dividing only on object
+   even "blocks" by uncompressed size, dividing only on commit
    boundaries.  The blocks are a logical concept only; responses are
    "thin" git pack files, which SHOULD be delta compressed against
-   objects preceding them in the commit reel or any other object
+   commits preceding them in the commit reel or any other commit
    reachable from the starting reference list.  The results MUST also
    be gzip compressed, conformant to the requirements of the git pack
    file format.  Specifically, these commit-reels are not merely the
@@ -656,12 +656,14 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 </figure>
 <t>
 
-    To keep the protocol simple, only complete objects are send in
-    messages, into "thin" pack files.  In optimal operation, these
-    are the only parts that will be transferred.  Objects are
-    considered to be "in" a block if they start within the block. This
-    implies that if single objects span several block boundaries, that
-    some blocks will contain no objects.  However, this irregularity
+    To keep the protocol simple, only complete commits are considered
+    to be within blocks, to simplify the generation of "thin" pack files.
+    In optimal operation, these
+    are the only parts that will be transferred.  Commits are
+    considered to be "in" a block if the previous commit object
+    completes on or after the beginning of the block.  This
+    implies that if single commits span several block boundaries, that
+    some blocks will contain no commits.  However, this irregularity
     of blocks is balanced by the fact that it is expensive to
     determine the real size of the pack without making it; and this
     cannot be performed deterministically over the entire swarm
@@ -1691,6 +1693,13 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
         all of the previous blocks in the reel to this one downloaded
         already, or happen to have the index around.
 
+<cref>SV - Quite.  This means that this request is effectively only
+      useful against seeds of a reel.  This could be relaxed to return
+      information about the objects held in the fragment the other
+      node has, I guess.  There should also be some kind of error
+      response defined perhaps.
+      </cref>
+
 </t>
 </section>
 <section anchor="pwp-request" title="Request">
@@ -1734,7 +1743,8 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 	payload holds a pair of reference SHA1 objects to which this
 	commit-reel corresponds, and the block offset and block length
 	as per the Scan message.  The "Offset" returned is the offset
-	into the block that the first object starts.  If the "Block
+	into the block's computed beginning that the first object
+	starts.  If the "Block
 	Length" is zero, the pack is a response to the auxiliary
 	"Request" method above, and the "Reel SHA1 Pair" arbitrarily
 	set to values that may be used for the "Stop" message.  If
@@ -1749,6 +1759,11 @@ f41e03ffa9b0d46f466bb73408c7562e49fcb435	refs/tags/review-0.2
 | Reel SHA1 Pair | Block offset | Block Length | Offset | Pack |
 ----------------------------------------------------------------</artwork>
 </figure>
+</t>
+<t>
+   The response to a "Play" request MAY contain more objects than are
+   defined to exist in that portion of the reel, but MUST contain all
+   of the objects that do.
 </t>
 </section>
 <section anchor="pwp-stop" title="Stop">
